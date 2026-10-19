@@ -154,6 +154,10 @@ else
   info "Creado"
 fi
 run chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+# Al pasar la carpeta al usuario del servicio, git (como root) la marcaría como "propiedad dudosa": se declara segura.
+if [ -d "$APP_DIR/.git" ] && ! git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$APP_DIR"; then
+  run git config --global --add safe.directory "$APP_DIR"
+fi
 run chmod +x "$APP_DIR/deploy/"*.sh "$APP_DIR/install.sh"
 if [ "$DRY" -eq 0 ] && ! runuser -u "$APP_USER" -- test -r "$APP_DIR/backend/package.json"; then
   die "El usuario $APP_USER no puede leer $APP_DIR (revisa los permisos de las carpetas superiores)."
