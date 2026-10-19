@@ -6,7 +6,8 @@
 # actualiza el "proxy_pass" de nginx y recarga nginx solo si hizo falta. También puedes ejecutarlo a mano.
 set -euo pipefail
 
-PORT_FILE="${PORT_FILE:-/opt/paragon/backend/.port}"
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PORT_FILE="${PORT_FILE:-$APP_DIR/backend/.port}"
 SITE="${NGINX_SITE:-/etc/nginx/sites-available/paragon}"
 
 START=$(date +%s)

@@ -36,7 +36,60 @@ No hay registro público: las cuentas las crean los oficiales/admins (una a una 
 
 ---
 
-# Instalación automática
+# Instalar en un servidor: UN SOLO COMANDO (Debian 12)
+
+**Antes:** apunta el dominio al servidor (registro **A** con la IP del VPS, ej. `paragon.tudominio.com`) y sube el
+proyecto al servidor, en cualquier carpeta que **no** esté dentro de `/root` (por ejemplo `/paragon-web`):
+
+```bash
+git clone URL_DEL_REPOSITORIO /paragon-web        # o cópialo con scp
+```
+
+**Luego, como root, un solo comando:**
+
+```bash
+cd /paragon-web
+bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com \
+                --admin-name TuUsuario --admin-email tucorreo@dominio.com
+```
+
+Eso es todo. El instalador hace **sin preguntarte nada más**:
+
+1. Instala los paquetes del sistema: nginx, PostgreSQL, certbot, ufw y Node.js 22.
+2. Crea el usuario del servicio `paragon` (la app no corre como root).
+3. Instala las dependencias y **compila la web**.
+4. Crea el **`.env`** (con un `JWT_SECRET` aleatorio), el **usuario y la base de PostgreSQL** (con clave aleatoria),
+   las **tablas**, los eventos iniciales y el **primer administrador** (sin necesitar correo).
+5. Configura **nginx**, el **servicio systemd** (arranca solo con el servidor) y pide el **certificado HTTPS**.
+6. Activa el **firewall** (SSH, 80 y 443), los **respaldos diarios** de la base y los **parches de seguridad** automáticos.
+
+Al terminar muestra la dirección de la web y la **contraseña temporal del administrador** (anótala: al primer ingreso
+se pide cambiarla).
+
+| Opción | Para qué |
+|---|---|
+| `--domain` y `--email` | Dominio y correo para el certificado HTTPS. **Sin dominio** se instala solo por IP, con HTTP |
+| `--admin-name` y `--admin-email` | Primer administrador. Si los omites y hay terminal, los pregunta |
+| `--no-https` / `--no-firewall` | No pedir certificado / no tocar el firewall |
+| `--update` | Hace `git pull` antes de instalar (para actualizar a una versión nueva) |
+| `--dry-run` | Muestra lo que haría, sin ejecutar nada |
+
+**Es seguro repetirlo:** no borra datos, no recrea lo que ya existe y no pisa la configuración de HTTPS de nginx.
+Si el dominio aún no apunta al servidor, instala igual por HTTP y te dice el comando para pedir el certificado después.
+
+**Actualizar a una versión nueva:**
+
+```bash
+cd /paragon-web
+bash install.sh --update --domain paragon.tudominio.com --email tucorreo@dominio.com
+```
+
+Después, entra a la web como administrador y sigue los pasos del panel (ver «Paso 10 · Configurar la web desde el panel»
+más abajo): correo, textos de la portada, primera temporada y miembros.
+
+---
+
+# Instalación automática (cómo funciona por dentro)
 
 Casi todo se crea solo. Hay **dos capas**:
 
@@ -87,7 +140,10 @@ npm run dev            # http://localhost:5173  (pasa /api al backend, aunque é
 
 ---
 
-# Parte 2 · Despliegue en un VPS con Debian 12
+# Parte 2 · Instalación MANUAL en Debian 12 (referencia)
+
+> **No hace falta seguir esta parte**: `install.sh` (arriba) hace todo esto solo. Se conserva por si quieres entender o
+> ajustar cada paso, o instalar a mano. Aquí las rutas usan `/opt/paragon`; ajústalas si instalaste en otra carpeta.
 
 Todos los comandos se ejecutan **como `root`** (o antepón `sudo`). Reemplaza lo que está en MAYÚSCULAS:
 `TU_DOMINIO`, `URL_DEL_REPOSITORIO`, etc.
@@ -279,13 +335,12 @@ El servidor intenta usar el puerto `PORT` (por defecto **4000**). Si está ocupa
 ## Actualizar a una versión nueva
 
 ```bash
-su - paragon -c "cd /opt/paragon && git pull"
-su - paragon -c "cd /opt/paragon/frontend && npm ci && npm run build"
-su - paragon -c "cd /opt/paragon/backend && npm ci --omit=dev"
-systemctl restart paragon          # las tablas se actualizan solas al arrancar
+cd /ruta/del/proyecto
+bash install.sh --update --domain TU_DOMINIO --email TU_CORREO
 ```
 
-Haz un respaldo antes de actualizar: `su - paragon -c /opt/paragon/deploy/backup.sh`.
+Hace `git pull`, recompila la web, reinicia el servicio y las tablas se actualizan solas. Haz un respaldo antes si quieres:
+`su - paragon -c /ruta/del/proyecto/deploy/backup.sh`.
 
 ## Comandos útiles
 

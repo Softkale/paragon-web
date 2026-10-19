@@ -7,7 +7,8 @@
 #   (crontab -u paragon -l 2>/dev/null; echo '30 4 * * * /opt/paragon/deploy/backup.sh') | crontab -u paragon -
 set -euo pipefail
 
-ENV_FILE="${ENV_FILE:-/opt/paragon/backend/.env}"
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${ENV_FILE:-$APP_DIR/backend/.env}"
 DIR="${BACKUP_DIR:-/var/backups/paragon}"
 
 DB_URL=$(grep -E '^DATABASE_URL=' "$ENV_FILE" | head -1 | cut -d= -f2-)

@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const readline = require('readline');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 
 function parseArgs(argv) {
   const out = {};
@@ -31,6 +31,21 @@ function parseArgs(argv) {
   }
   return out;
 }
+
+// Si todavía no se instalaron las dependencias (npm ci / npm install), las instala aquí mismo.
+function ensureDependencies() {
+  const backendDir = path.join(__dirname, '..');
+  if (fs.existsSync(path.join(backendDir, 'node_modules', 'pg'))) return;
+  const cmd = fs.existsSync(path.join(backendDir, 'package-lock.json')) ? 'ci' : 'install';
+  console.log(`Faltan las dependencias del backend: instalándolas (npm ${cmd} --omit=dev)…\n\n`);
+  const r = spawnSync('npm', [cmd, '--omit=dev', '--no-audit', '--no-fund'], { cwd: backendDir, stdio: 'inherit', shell: process.platform === 'win32' });
+  if (r.status !== 0) {
+    console.error('\nNo se pudieron instalar las dependencias. Ejecuta manualmente en backend/:  npm ci --omit=dev');
+    process.exit(1);
+  }
+  console.log('');
+}
+ensureDependencies();
 
 const args = parseArgs(process.argv.slice(2));
 const production = !!args.production || process.env.NODE_ENV === 'production';
