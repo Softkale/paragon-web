@@ -64,14 +64,26 @@ async function saveConfig({ host, port, secure, user, pass, clearPass, from, app
 }
 
 let cached = { sig: '', transporter: null };
+// Nombre con el que PARAGON se presenta al servidor de correo (HELO/EHLO). Por defecto Node usa "[127.0.0.1]",
+// y muchos filtros antispam rechazan a un remitente externo que se identifica así. Se usa el dominio de la web.
+function heloName(appUrl) {
+  try {
+    const host = new URL(appUrl).hostname;
+    return host && host !== 'localhost' && !/^[\d.]+$/.test(host) ? host : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function transporterFor(c) {
-  const sig = JSON.stringify([c.host, c.port, c.secure, c.user, c.pass]);
+  const sig = JSON.stringify([c.host, c.port, c.secure, c.user, c.pass, c.appUrl]);
   if (cached.sig !== sig) {
     cached = {
       sig,
       transporter: nodemailer.createTransport({
         host: c.host, port: c.port, secure: c.secure,
         auth: c.user ? { user: c.user, pass: c.pass } : undefined,
+        name: heloName(c.appUrl),
         connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 20000,
       }),
     };

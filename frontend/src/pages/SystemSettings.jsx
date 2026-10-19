@@ -103,7 +103,9 @@ function MailSettings() {
             <label className="check-row"><input type="checkbox" checked={form.clearPass} onChange={set('clearPass')} /> Quitar la contraseña guardada</label>
           </label>
         )}
-        <label className="field field--wide"><span>Remitente (como lo verán los usuarios)</span><input value={form.from} onChange={set('from')} placeholder="PARAGON <no-reply@tudominio.com>" /></label>
+        <label className="field field--wide"><span>Remitente (como lo verán los usuarios)</span><input value={form.from} onChange={set('from')} placeholder="PARAGON <no-reply@tudominio.com>" />
+          <small className="muted">Debe ser un <b>buzón que exista</b> en tu servidor de correo (lo ideal: el mismo usuario SMTP). Si no existe, el servidor acepta el mensaje y luego lo devuelve como rebote («Invalid sender»), aunque aquí figure como Enviado.</small>
+        </label>
         <label className="field field--wide"><span>Dirección pública de la web (va en el botón «Ingresar» del correo)</span><input value={form.appUrl} onChange={set('appUrl')} placeholder="https://paragon.tudominio.com" required /></label>
         <div className="form-actions field--wide">
           <button className="btn btn--sm" type="submit" disabled={busy || !dirty}>{busy ? 'Guardando…' : 'Guardar configuración'}</button>

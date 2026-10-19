@@ -424,6 +424,7 @@ journalctl -u paragon --since today | grep '\[mail\]'           # lo de hoy
 
 | Síntoma | Causa y solución |
 |---|---|
+| Llega un rebote con `Verification failed for <remitente>` / `Invalid sender` / `Relay access denied` | El **remitente no existe como buzón** en tu servidor de correo (o el enrutamiento del dominio está mal). Crea el buzón (ej. `admin@tudominio.com`), úsalo como **usuario SMTP y como remitente** en Configuración → Correo, y en cPanel → *Enrutamiento de correo* elige «Local Mail Exchanger». En el panel el envío figuraba como «Enviado» porque el servidor aceptó el mensaje y recién después lo rechazó. Prueba: enviar desde el webmail del hosting con ese buzón; si también rebota, es configuración del hosting |
 | `Release file ... is not valid yet` al instalar | El reloj del servidor está desfasado. El instalador lo corrige solo; a mano: `timedatectl set-ntp true && apt-get install -y chrony && systemctl enable --now chrony && chronyc makestep` y repetir |
 | `502 Bad Gateway` en el navegador | El servicio no corre: `systemctl status paragon` y `journalctl -u paragon -n 50` |
 | El servicio se reinicia solo | Mira el motivo en `journalctl -u paragon -n 50` (casi siempre la conexión a la base) |
