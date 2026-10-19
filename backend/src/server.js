@@ -1,5 +1,6 @@
 require('express-async-errors');
-require('dotenv').config();
+require('./lib/bootstrap').ensureEnvFile(); // si falta backend/.env lo crea (con un JWT_SECRET aleatorio)
+require('dotenv').config({ path: require('./lib/bootstrap').ENV_PATH });
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -86,6 +87,51 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Error del servidor' });
 });
 
-const port = process.env.PORT || 4000;
+// ---------- Arranque con puerto automático ----------
+// Si el puerto preferido está ocupado, prueba con el siguiente libre. El puerto elegido se anota en backend/.port
+// para que el entorno de desarrollo (Vite) y nginx (deploy/sync-nginx-port.sh) sepan dónde está. PORT_STRICT=true lo desactiva.
+const preferred = Number(process.env.PORT) || 4000;
 const host = process.env.HOST || undefined; // en un VPS detrás de nginx: HOST=127.0.0.1
-app.listen(port, host, () => console.log(`PARAGON en http://${host || 'localhost'}:${port} (${isProd ? 'producción' : 'desarrollo'})`));
+const strict = process.env.PORT_STRICT === 'true';
+const MAX_TRIES = 50;
+const portFile = process.env.PORT_FILE || path.join(__dirname, '../.port');
+
+let ownPort = null;
+
+// Solo borra el archivo si el puerto anotado es el de ESTA instancia (otra puede haber tomado su lugar).
+function removePortFile() {
+  try {
+    if (ownPort !== null && fs.readFileSync(portFile, 'utf8').trim() === String(ownPort)) fs.unlinkSync(portFile);
+  } catch { /* ya no existe */ }
+}
+
+function start(port, tries = 0) {
+  const server = app.listen(port, host);
+  server.once('listening', () => {
+    ownPort = port;
+    fs.writeFileSync(portFile, String(port));
+    if (port !== preferred) console.warn(`[aviso] El puerto ${preferred} estaba ocupado: se usa el ${port} (anotado en ${path.basename(portFile)}).`);
+    console.log(`PARAGON en http://${host || 'localhost'}:${port} (${isProd ? 'producción' : 'desarrollo'})`);
+  });
+  server.once('error', (err) => {
+    if (err.code === 'EADDRINUSE' && !strict && tries < MAX_TRIES) {
+      console.warn(`Puerto ${port} en uso, probando el ${port + 1}…`);
+      start(port + 1, tries + 1);
+    } else {
+      console.error(err.code === 'EADDRINUSE' ? `El puerto ${port} está en uso (PORT_STRICT activo o sin puertos libres).` : err);
+      process.exit(1);
+    }
+  });
+}
+
+// Antes de escuchar, prepara todo lo necesario: crea la base de datos y las tablas si no existen
+// (y el primer admin si se dio ADMIN_NAME / ADMIN_EMAIL). AUTO_INIT=false lo desactiva.
+(async () => {
+  if (process.env.AUTO_INIT !== 'false') await require('./lib/bootstrap').bootstrap();
+  start(preferred);
+})().catch((err) => {
+  console.error(`No se pudo preparar la base de datos: ${err.message}`);
+  process.exit(1);
+});
+['SIGINT', 'SIGTERM'].forEach((sig) => process.on(sig, () => { removePortFile(); process.exit(0); }));
+process.on('exit', removePortFile);

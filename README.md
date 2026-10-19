@@ -12,20 +12,17 @@ webparagon/
 ├── frontend/   Web (React). Se compila a frontend/dist
 ├── backend/    API + servidor de la web compilada
 │   ├── db/schema.sql      Tablas
-│   ├── scripts/           init-db.js · create-admin.js
-│   └── .env(.production).example
-├── deploy/     nginx.conf · paragon.service · backup.sh
+│   ├── scripts/           setup.js · create-admin.js · init-db.js
+│   └── .env               Se crea solo (ver «Instalación automática»)
+├── deploy/     nginx.conf · paragon.service · sync-nginx-port.sh · backup.sh
 └── README.md   Esta guía
 ```
 
-En producción **la web y la API salen de un solo proceso Node** (`127.0.0.1:4000`). nginx recibe el tráfico y pone
-el HTTPS:
+En producción **la web y la API salen de un solo proceso Node**. nginx recibe el tráfico y pone el HTTPS:
 
 ```
-Internet ─► nginx (80/443) ─► Node :4000 (web compilada + API) ─► PostgreSQL
+Internet ─► nginx (80/443) ─► Node (web compilada + API) ─► PostgreSQL
 ```
-
----
 
 ## Roles
 
@@ -39,33 +36,61 @@ No hay registro público: las cuentas las crean los oficiales/admins (una a una 
 
 ---
 
+# Instalación automática
+
+Casi todo se crea solo. Hay **dos capas**:
+
+**1. Al arrancar el servidor** (`npm start` / `npm run dev`), automáticamente:
+- Si falta `backend/.env`, lo **crea** con un `JWT_SECRET` aleatorio (y si le falta algo esencial, lo completa).
+- **Crea la base de datos** si no existe y **crea o actualiza las tablas** (también carga los eventos iniciales una vez).
+  Por eso, al actualizar a una versión nueva basta con reiniciar: las tablas se actualizan solas.
+- Si el **puerto está ocupado**, usa el siguiente libre (ver «Puerto automático»).
+- Si defines `ADMIN_NAME` y `ADMIN_EMAIL` y aún no hay ningún admin, **crea el primero** y muestra su clave temporal.
+
+**2. `npm run setup`: el asistente que deja todo listo de una vez.** Además de lo anterior:
+- Crea el **usuario y la base de PostgreSQL** (con una clave aleatoria) y escribe `DATABASE_URL` en el `.env`.
+- Crea el **primer administrador**, sin necesidad de correo.
+
+Para crear el usuario y la base de PostgreSQL el asistente necesita un administrador de PostgreSQL; lo obtiene así:
+
+| Situación | Qué hace |
+|---|---|
+| En un servidor Linux, ejecutado como **root** con PostgreSQL local | Usa el usuario del sistema `postgres` (no pide clave) |
+| En tu computador | Te pregunta la clave del usuario `postgres` (no se guarda en ningún archivo) |
+| Sin preguntas | `npm run setup -- --yes --admin-url postgres://postgres:CLAVE@localhost:5432/postgres ...` |
+
+Es **seguro repetirlo**: no borra nada, y si ya está todo configurado lo indica y no cambia nada.
+
+Opciones sin preguntas (`--yes`): `--db-name --db-user --db-pass --host --port --admin-name --admin-email [--admin-password]`.
+Con `--production` el `.env` nuevo sale con `NODE_ENV=production`, `HOST=127.0.0.1` y `TRUST_PROXY=1`.
+
+---
+
 # Parte 1 · Desarrollo local (Windows / Linux / Mac)
 
-Requisitos: Node.js 20+ y PostgreSQL 14+.
+Requisitos: Node.js 20+ y PostgreSQL 14+ instalados y corriendo.
 
 ```bash
-# 1) Base de datos: crea una vacía llamada "paragon"
-
-# 2) Backend
+# Backend
 cd backend
 npm install
-cp .env.example .env          # edita DATABASE_URL y JWT_SECRET
-npm run db:init               # crea las tablas y los eventos iniciales
-npm run admin:create -- --name TuUsuario --email tucorreo@dominio.com
-npm run dev                   # http://localhost:4000
+npm run setup          # crea .env, usuario y base de PostgreSQL, tablas y el primer admin (te hace unas preguntas)
+npm run dev            # http://localhost:4000
 
-# 3) Frontend (otra terminal)
+# Frontend (otra terminal)
 cd frontend
 npm install
-npm run dev                   # http://localhost:5173  (pasa /api al backend)
+npm run dev            # http://localhost:5173  (pasa /api al backend, aunque éste use otro puerto)
 ```
+
+> Arranca primero el backend. Si cambia de puerto, reinicia el servidor de la web.
 
 ---
 
 # Parte 2 · Despliegue en un VPS con Debian 12
 
 Todos los comandos se ejecutan **como `root`** (o antepón `sudo`). Reemplaza lo que está en MAYÚSCULAS:
-`TU_DOMINIO`, `CLAVE_DE_LA_BASE`, `URL_DEL_REPOSITORIO`, etc.
+`TU_DOMINIO`, `URL_DEL_REPOSITORIO`, etc.
 
 **Antes de empezar necesitas:**
 - Un VPS con Debian 12 (1 GB de RAM alcanza) y acceso SSH.
@@ -107,21 +132,9 @@ node -v          # debe mostrar v22.x
 psql --version   # PostgreSQL 15
 ```
 
-## Paso 4 · Crear la base de datos
+**No hace falta crear nada en PostgreSQL a mano**: el asistente del Paso 6 crea el usuario y la base.
 
-```bash
-su - postgres -c "psql" <<'SQL'
-CREATE USER paragon WITH PASSWORD 'CLAVE_DE_LA_BASE';
-CREATE DATABASE paragon OWNER paragon ENCODING 'UTF8';
-SQL
-```
-
-Elige una clave larga. Si contiene símbolos (`@ : / # $ %`), en el `.env` tendrás que codificarlos
-(por ejemplo `@` → `%40`); lo más simple es usar solo letras y números.
-
-Prueba la conexión: `psql "postgres://paragon:CLAVE_DE_LA_BASE@localhost:5432/paragon" -c "select 1"`
-
-## Paso 5 · Usuario del sistema y código
+## Paso 4 · Usuario del sistema y código
 
 ```bash
 # Usuario sin privilegios que ejecutará la aplicación
@@ -136,66 +149,57 @@ git clone URL_DEL_REPOSITORIO /opt/paragon
 #   (en el VPS)  mkdir -p /opt/paragon && tar -xzf /tmp/paragon.tar.gz -C /opt/paragon --strip-components=1
 
 chown -R paragon:paragon /opt/paragon
+chmod +x /opt/paragon/deploy/*.sh
 ```
 
 > Si usas Git y el repositorio es privado, configura antes una *deploy key* o usa un token en la URL.
 
-## Paso 6 · Configurar el backend (`.env`)
+## Paso 5 · Instalar dependencias y compilar la web
 
 ```bash
-su - paragon
+su - paragon -c "cd /opt/paragon/frontend && npm ci && npm run build"     # genera frontend/dist
+su - paragon -c "cd /opt/paragon/backend && npm ci --omit=dev"
+```
+
+## Paso 6 · Instalación automática: `.env`, base de datos, tablas y primer admin
+
+Como **root**:
+
+```bash
 cd /opt/paragon/backend
-cp .env.production.example .env
-openssl rand -hex 48          # copia el resultado: será el JWT_SECRET
-nano .env
+npm run setup -- --production
 ```
 
-Completa **al menos** estas líneas del `.env`:
+El asistente, sin que tengas que escribir nada de PostgreSQL:
 
-```ini
-NODE_ENV=production
-PORT=4000
-HOST=127.0.0.1
-TRUST_PROXY=1
-DATABASE_URL=postgres://paragon:CLAVE_DE_LA_BASE@localhost:5432/paragon
-JWT_SECRET=PEGA_AQUI_EL_VALOR_DE_openssl
-```
+1. Crea `backend/.env` con `NODE_ENV=production`, `HOST=127.0.0.1`, `TRUST_PROXY=1` y un `JWT_SECRET` aleatorio.
+2. Crea el usuario `paragon` y la base `paragon` en PostgreSQL con una **clave aleatoria** y la guarda en el `.env`.
+3. Crea las tablas y los eventos iniciales.
+4. Te pide el **usuario y el correo del primer administrador** y muestra su **contraseña temporal una sola vez**
+   (anótala; al primer ingreso la web te obliga a cambiarla). No necesita correo configurado.
 
-Protege el archivo: `chmod 600 .env`.
+El `.env` queda a nombre del usuario `paragon` con permisos `600`.
 
-> El servidor **se niega a arrancar** en producción si `JWT_SECRET` tiene menos de 32 caracteres.
-> Guarda ese valor en un lugar seguro: si lo cambias, se cierran todas las sesiones y hay que volver a escribir la
-> contraseña del correo (SMTP) en el panel.
-
-## Paso 7 · Compilar la web y crear las tablas
-
-Todavía como usuario `paragon`:
+Sin preguntas (útil para automatizar):
 
 ```bash
-cd /opt/paragon/frontend
-npm ci
-npm run build                 # genera frontend/dist
-
-cd /opt/paragon/backend
-npm ci --omit=dev
-npm run db:init               # crea las tablas y carga los eventos iniciales (es seguro repetirlo)
+npm run setup -- --production --yes --admin-name TuUsuario --admin-email tucorreo@dominio.com
 ```
 
-## Paso 8 · Crear el primer administrador (sin correo)
+> Guarda el `JWT_SECRET` del `.env` en un lugar seguro: si lo cambias, se cierran todas las sesiones y hay que volver
+> a escribir la contraseña del correo (SMTP) en el panel.
+
+## Paso 7 · nginx (HTTP)
 
 ```bash
-npm run admin:create -- --name TuUsuario --email tucorreo@dominio.com
+cp /opt/paragon/deploy/nginx.conf /etc/nginx/sites-available/paragon
+nano /etc/nginx/sites-available/paragon                 # cambia paragon.tudominio.com por TU_DOMINIO
+rm -f /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/paragon /etc/nginx/sites-enabled/paragon
+nginx -t && systemctl reload nginx
 ```
 
-Muestra una **contraseña temporal una sola vez**: anótala. Al primer ingreso la web te obligará a cambiarla.
-No hace falta tener el correo configurado.
-
-Para crear más admins, repite el comando o hazlo luego desde el panel
-(*Miembros → + Nuevo miembro → rol admin*, desmarcando «Enviar accesos por correo»).
-
-Vuelve a `root` con `exit`.
-
-## Paso 9 · Dejarlo corriendo como servicio (systemd)
+## Paso 8 · Dejarlo corriendo como servicio (systemd)
 
 ```bash
 mkdir -p /opt/paragon/backend/outbox
@@ -205,29 +209,22 @@ cp /opt/paragon/deploy/paragon.service /etc/systemd/system/paragon.service
 systemctl daemon-reload
 systemctl enable --now paragon
 
-systemctl status paragon                   # debe decir "active (running)"
-curl http://127.0.0.1:4000/api/health      # debe responder {"ok":true}
-journalctl -u paragon -f                   # ver los registros (Ctrl+C para salir)
+systemctl status paragon                                   # debe decir "active (running)"
+curl http://127.0.0.1:$(cat /opt/paragon/backend/.port)/api/health     # debe responder {"ok":true}
+journalctl -u paragon -f                                   # ver los registros (Ctrl+C para salir)
 ```
 
-Si no arranca, `journalctl -u paragon -n 50` dice el motivo (casi siempre el `.env` o la conexión a la base).
+Si no arranca, `journalctl -u paragon -n 50` dice el motivo.
 
-## Paso 10 · nginx y HTTPS
+## Paso 9 · HTTPS
 
 ```bash
-cp /opt/paragon/deploy/nginx.conf /etc/nginx/sites-available/paragon
-nano /etc/nginx/sites-available/paragon                 # cambia paragon.tudominio.com por TU_DOMINIO
-rm -f /etc/nginx/sites-enabled/default
-ln -s /etc/nginx/sites-available/paragon /etc/nginx/sites-enabled/paragon
-nginx -t && systemctl reload nginx
-
-# Certificado HTTPS gratuito (se renueva solo)
 certbot --nginx -d TU_DOMINIO --redirect -m tucorreo@dominio.com --agree-tos
 ```
 
-Abre `https://TU_DOMINIO` en el navegador: debe verse la portada. Entra en `/login` con el admin del Paso 8.
+Abre `https://TU_DOMINIO`: debe verse la portada. Entra en `/login` con el admin del Paso 6.
 
-## Paso 11 · Configurar la web desde el panel
+## Paso 10 · Configurar la web desde el panel
 
 Entra como admin y revisa, en este orden:
 
@@ -243,18 +240,15 @@ Entra como admin y revisa, en este orden:
    El reloj del servidor no importa: la hora se calcula con esa zona horaria.
 5. **Miembros:** crea a los miembros (uno a uno o con **Carga masiva** pegando/subiendo un CSV
    `usuario;correo;clase;rol`). Cada uno recibe sus accesos por correo y queda como «Invitación pendiente» hasta
-   que cambia su clave.
+   que cambia su clave. Si el correo aún no está configurado, desmarca «Enviar accesos por correo» y copia la clave
+   temporal que aparece en pantalla.
 
-## Paso 12 · Respaldos automáticos
+## Paso 11 · Respaldos automáticos
 
 ```bash
-# Permite a "paragon" conectarse a la base sin pedir clave
-su - paragon -c "echo 'localhost:5432:paragon:paragon:CLAVE_DE_LA_BASE' > ~/.pgpass && chmod 600 ~/.pgpass"
-
 mkdir -p /var/backups/paragon && chown paragon:paragon /var/backups/paragon
-chmod +x /opt/paragon/deploy/backup.sh
 
-# Programarlo todos los días a las 04:30
+# Programarlo todos los días a las 04:30 (lee la conexión del .env, no hay que configurar claves)
 (crontab -u paragon -l 2>/dev/null; echo '30 4 * * * /opt/paragon/deploy/backup.sh') | crontab -u paragon -
 
 # Probarlo ahora
@@ -264,21 +258,31 @@ su - paragon -c "/opt/paragon/deploy/backup.sh" && ls -lh /var/backups/paragon
 Conserva los últimos 14 días. **Descarga copias fuera del servidor** de vez en cuando
 (`scp root@IP:/var/backups/paragon/paragon-AAAA-MM-DD.dump .`).
 
-Restaurar en una base vacía:
-`pg_restore -h localhost -U paragon -d paragon --clean --if-exists ARCHIVO.dump`
+Restaurar en una base vacía (la conexión está en `DATABASE_URL` del `.env`):
+`pg_restore -d "URL_DE_LA_BASE" --clean --if-exists ARCHIVO.dump`
 
 ---
 
 # Parte 3 · Operación diaria
 
+## Puerto automático
+
+El servidor intenta usar el puerto `PORT` (por defecto **4000**). Si está ocupado, **prueba con el siguiente libre**
+(4001, 4002…) y anota el que eligió en `backend/.port`:
+
+- **Desarrollo:** el servidor de la web (Vite) lee ese archivo al arrancar y apunta solo al puerto correcto.
+- **Servidor:** `paragon.service` ejecuta `deploy/sync-nginx-port.sh` después de arrancar; si el puerto cambió,
+  actualiza el `proxy_pass` de nginx y lo recarga. No tienes que hacer nada.
+- Ver el puerto actual: `cat /opt/paragon/backend/.port`.
+- Si prefieres que falle en vez de buscar otro, pon `PORT_STRICT=true` en el `.env`.
+
 ## Actualizar a una versión nueva
 
 ```bash
-cd /opt/paragon
 su - paragon -c "cd /opt/paragon && git pull"
 su - paragon -c "cd /opt/paragon/frontend && npm ci && npm run build"
-su - paragon -c "cd /opt/paragon/backend && npm ci --omit=dev && npm run db:init"   # seguro de repetir
-systemctl restart paragon
+su - paragon -c "cd /opt/paragon/backend && npm ci --omit=dev"
+systemctl restart paragon          # las tablas se actualizan solas al arrancar
 ```
 
 Haz un respaldo antes de actualizar: `su - paragon -c /opt/paragon/deploy/backup.sh`.
@@ -290,10 +294,11 @@ Haz un respaldo antes de actualizar: `su - paragon -c /opt/paragon/deploy/backup
 | Estado del servicio | `systemctl status paragon` |
 | Reiniciar | `systemctl restart paragon` |
 | Ver registros en vivo | `journalctl -u paragon -f` |
-| Comprobar que responde | `curl http://127.0.0.1:4000/api/health` |
+| Comprobar que responde | `curl http://127.0.0.1:$(cat /opt/paragon/backend/.port)/api/health` |
 | Recargar nginx | `nginx -t && systemctl reload nginx` |
 | Renovación del certificado (prueba) | `certbot renew --dry-run` |
 | Crear/restablecer un admin | `cd /opt/paragon/backend && su paragon -c "npm run admin:create -- --name X --email Y --reset"` |
+| Repetir la instalación (seguro) | `cd /opt/paragon/backend && npm run setup -- --production` |
 
 ## Si nadie puede entrar
 
@@ -311,8 +316,10 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 | Síntoma | Causa y solución |
 |---|---|
 | `502 Bad Gateway` en el navegador | El servicio no corre: `systemctl status paragon` y `journalctl -u paragon -n 50` |
-| El servicio se reinicia solo | Error en `.env` (falta `DATABASE_URL` / `JWT_SECRET` < 32 caracteres) o la base no responde |
-| `password authentication failed` | La clave de `DATABASE_URL` no coincide con la del usuario `paragon` de PostgreSQL |
+| El servicio se reinicia solo | Mira el motivo en `journalctl -u paragon -n 50` (casi siempre la conexión a la base) |
+| `No se pudo conectar a PostgreSQL (28P01)` | La clave de `DATABASE_URL` no coincide. Ejecuta `npm run setup -- --production` como root: la ajusta |
+| «El usuario … no tiene permiso para crear bases» | Ejecuta `npm run setup` (crea la base con un administrador de PostgreSQL) |
+| Aviso «El puerto 4000 estaba ocupado» | Normal: usa otro puerto y nginx se ajusta solo. Ver `cat backend/.port` |
 | Los correos no llegan | Usa «Enviar correo de prueba» en Configuración; el mensaje indica qué corregir. Revisa spam |
 | Los enlaces de los correos van a `localhost` | Falta la dirección pública en **Configuración → Correo** |
 | Todos aparecen con la misma IP / bloqueos raros | Falta `TRUST_PROXY=1` en el `.env` |
@@ -325,13 +332,19 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 
 ## Variables de entorno (`backend/.env`)
 
+El `.env` se genera solo; estas son las variables que puede contener:
+
 | Variable | Para qué |
 |---|---|
-| `DATABASE_URL` | Conexión a PostgreSQL (**obligatoria**) |
-| `JWT_SECRET` | Firma de sesiones y cifrado de secretos (**obligatoria**; ≥ 32 caracteres en producción) |
+| `DATABASE_URL` | Conexión a PostgreSQL (la escribe el asistente) |
+| `JWT_SECRET` | Firma de sesiones y cifrado de secretos (se genera solo; ≥ 32 caracteres en producción) |
 | `NODE_ENV=production` | Activa HSTS, CORS cerrado y la exigencia del `JWT_SECRET` fuerte |
-| `HOST`, `PORT` | Dónde escucha (`127.0.0.1` y `4000` detrás de nginx) |
+| `HOST`, `PORT` | Dónde escucha (`127.0.0.1` y `4000` por defecto; si el puerto está ocupado usa otro) |
+| `PORT_STRICT=true` | No buscar otro puerto: fallar si el indicado está ocupado |
 | `TRUST_PROXY=1` | Obligatoria detrás de nginx para ver la IP real de cada visitante |
+| `AUTO_INIT=false` | No crear la base/tablas al arrancar (por defecto sí se crean) |
+| `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Si no hay ningún admin, se crea el primero al arrancar (`ADMIN_PASSWORD` es opcional) |
+| `PG_ADMIN_URL` | Solo para crear el usuario/base de PostgreSQL desde el arranque; **no la dejes guardada** |
 | `FRONTEND_DIST` | Ruta de la web compilada, si no está en `../frontend/dist` |
 | `CORS_ORIGIN` | Solo si sirves la web desde otro dominio |
 | `APP_URL`, `SMTP_*` | Opcionales: se configuran desde el panel; aquí solo si quieres dejarlos fijos |
@@ -340,6 +353,7 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 
 - HTTPS (nginx + certbot), cabeceras de seguridad (helmet) y política de contenido restrictiva.
 - Contraseñas con bcrypt. La contraseña del SMTP se guarda **cifrada** y nunca se vuelve a mostrar.
+- El `.env` se crea con permisos `600`; la conexión de administrador de PostgreSQL **nunca se guarda**.
 - Los permisos de cada usuario se comprueban en la base de datos en **cada petición**: quitar un rol o desactivar
   una cuenta surte efecto al instante.
 - Bloqueo tras 8 intentos fallidos de ingreso (por IP y usuario) y límite en la recuperación de contraseña.
@@ -350,4 +364,3 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 
 - `apt install fail2ban` protege SSH contra intentos de fuerza bruta.
 - Cambia el puerto SSH o limita el acceso por IP en el firewall si tienes IP fija.
-- Programa reinicios solo cuando haya actualizaciones del kernel (`needrestart`).

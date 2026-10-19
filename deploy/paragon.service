@@ -11,6 +11,8 @@ User=paragon
 WorkingDirectory=/opt/paragon/backend
 EnvironmentFile=/opt/paragon/backend/.env
 ExecStart=/usr/bin/node src/server.js
+# El "+" lo ejecuta como root: si el puerto 4000 estaba ocupado, ajusta nginx al puerto real.
+ExecStartPost=+/opt/paragon/deploy/sync-nginx-port.sh
 Restart=always
 RestartSec=3
 
