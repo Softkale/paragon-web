@@ -55,13 +55,14 @@ bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com \
 
 Eso es todo. El instalador hace **sin preguntarte nada más**:
 
-1. Instala los paquetes del sistema: nginx, PostgreSQL, certbot, ufw y Node.js 22.
+1. Instala **solo los paquetes que falten**: nginx, PostgreSQL, certbot y Node.js 22 (si ya tienes Node 20+, lo respeta).
 2. Crea el usuario del servicio `paragon` (la app no corre como root).
 3. Instala las dependencias y **compila la web**.
 4. Crea el **`.env`** (con un `JWT_SECRET` aleatorio), el **usuario y la base de PostgreSQL** (con clave aleatoria),
    las **tablas**, los eventos iniciales y el **primer administrador** (sin necesitar correo).
-5. Configura **nginx**, el **servicio systemd** (arranca solo con el servidor) y pide el **certificado HTTPS**.
-6. Activa el **firewall** (SSH, 80 y 443), los **respaldos diarios** de la base y los **parches de seguridad** automáticos.
+5. Configura **nginx** (un sitio nuevo, sin tocar los existentes), el **servicio systemd** (arranca solo con el
+   servidor) y pide el **certificado HTTPS**.
+6. Programa los **respaldos diarios** de la base de datos.
 
 Al terminar muestra la dirección de la web y la **contraseña temporal del administrador** (anótala: al primer ingreso
 se pide cambiarla).
@@ -70,9 +71,29 @@ se pide cambiarla).
 |---|---|
 | `--domain` y `--email` | Dominio y correo para el certificado HTTPS. **Sin dominio** se instala solo por IP, con HTTP |
 | `--admin-name` y `--admin-email` | Primer administrador. Si los omites y hay terminal, los pregunta |
-| `--no-https` / `--no-firewall` | No pedir certificado / no tocar el firewall |
+| `--no-https` | No pedir certificado |
+| `--firewall` | **Solo en un servidor nuevo:** activa `ufw` dejando abiertos únicamente SSH, 80 y 443 |
+| `--auto-updates` | **Solo en un servidor nuevo:** activa los parches de seguridad automáticos |
 | `--update` | Hace `git pull` antes de instalar (para actualizar a una versión nueva) |
 | `--dry-run` | Muestra lo que haría, sin ejecutar nada |
+
+### ¿El servidor ya aloja otras aplicaciones (PM2, nginx con otros sitios…)?
+
+El instalador está pensado para convivir con ellas. **No afecta a PM2 ni a tus otras apps**, porque PARAGON corre como su
+propio servicio de systemd, con su propio usuario, carpeta y base de datos. En concreto:
+
+| Qué | Cómo se comporta |
+|---|---|
+| **Tus sitios de nginx** | No se modifican ni se reemplazan. Solo se agrega un sitio nuevo (`/etc/nginx/sites-available/paragon`) que responde únicamente al dominio indicado. Antes de recargar nginx se valida la configuración completa (`nginx -t`) y la recarga no corta conexiones |
+| **Puerto** | Si el 4000 lo usa otra app, PARAGON toma otro libre solo y nginx se ajusta |
+| **Paquetes ya instalados** | No se actualizan (`--no-upgrade`): así nginx y PostgreSQL no se reinician por culpa del instalador |
+| **Node.js** | Si ya hay Node 20 o superior se usa; no se reemplaza |
+| **PostgreSQL** | Se crea un usuario y una base propios (`paragon`); las demás bases no se tocan |
+| **certbot** | Si ya lo tienes (apt o snap) se usa ese |
+| **Firewall y parches automáticos** | **No se tocan** salvo que uses `--firewall` / `--auto-updates` (pensados para un servidor nuevo) |
+
+Antes de instalar conviene confirmar que no exista ya un usuario o una base de PostgreSQL llamados `paragon`
+(`su - postgres -c "psql -l"`): si existen, el asistente cambia la clave de ese usuario para que coincida con el `.env`.
 
 **Es seguro repetirlo:** no borra datos, no recrea lo que ya existe y no pisa la configuración de HTTPS de nginx.
 Si el dominio aún no apunta al servidor, instala igual por HTTP y te dice el comando para pedir el certificado después.
@@ -370,6 +391,7 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 
 | Síntoma | Causa y solución |
 |---|---|
+| `Release file ... is not valid yet` al instalar | El reloj del servidor está desfasado. El instalador lo corrige solo; a mano: `timedatectl set-ntp true && apt-get install -y chrony && systemctl enable --now chrony && chronyc makestep` y repetir |
 | `502 Bad Gateway` en el navegador | El servicio no corre: `systemctl status paragon` y `journalctl -u paragon -n 50` |
 | El servicio se reinicia solo | Mira el motivo en `journalctl -u paragon -n 50` (casi siempre la conexión a la base) |
 | `No se pudo conectar a PostgreSQL (28P01)` | La clave de `DATABASE_URL` no coincide. Ejecuta `npm run setup -- --production` como root: la ajusta |

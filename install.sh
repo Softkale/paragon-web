@@ -8,14 +8,19 @@
 #                     --admin-name TuUsuario --admin-email tucorreo@dominio.com
 #
 #  Instala y configura TODO: paquetes, Node.js 22, PostgreSQL, nginx, el usuario del servicio, dependencias,
-#  compilación de la web, base de datos, .env, administrador, servicio systemd, nginx, HTTPS, firewall y respaldos.
+#  compilación de la web, base de datos, .env, administrador, servicio systemd, nginx, HTTPS y respaldos.
 #  Es seguro repetirlo (actualiza lo que haga falta sin borrar datos).
+#
+#  Pensado también para servidores que YA alojan otras aplicaciones (PM2, nginx con otros sitios, PostgreSQL):
+#  no actualiza paquetes ya instalados, no toca los demás sitios de nginx ni el firewall, y usa un puerto libre.
 #
 #  Opciones:
 #    --domain D          dominio de la web (su registro A debe apuntar a este servidor). Sin dominio: solo por IP, sin HTTPS.
 #    --email E           correo para el certificado HTTPS (Let's Encrypt)
 #    --admin-name N      usuario del primer administrador          --admin-email C    su correo
-#    --no-https          no pedir certificado        --no-firewall   no tocar el firewall (ufw)
+#    --no-https          no pedir certificado
+#    --firewall          (servidor NUEVO) activa ufw dejando solo SSH, 80 y 443. Por defecto NO se toca el firewall
+#    --auto-updates      (servidor NUEVO) activa los parches de seguridad automáticos
 #    --update            antes de instalar hace "git pull" (si el proyecto es un repositorio Git)
 #    --user U            usuario del sistema que ejecuta la app (por defecto: paragon)
 #    --dry-run           muestra lo que haría sin ejecutar nada
@@ -26,7 +31,7 @@ APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_USER="paragon"
 NODE_MAJOR=22
 DOMAIN=""; EMAIL=""; ADMIN_NAME=""; ADMIN_EMAIL=""
-FIREWALL=1; HTTPS=1; DRY=0; UPDATE=0
+FIREWALL=0; AUTO_UPDATES=0; HTTPS=1; DRY=0; UPDATE=0
 
 # ---------- utilidades ----------
 if [ -t 1 ]; then B=$'\033[1m'; G=$'\033[32m'; Y=$'\033[33m'; R=$'\033[31m'; N=$'\033[0m'; else B=""; G=""; Y=""; R=""; N=""; fi
@@ -44,6 +49,17 @@ as_app() {
   run runuser -u "$APP_USER" -- env HOME="$APP_DIR" npm_config_cache="$APP_DIR/.npm" bash -c 'cd "$1" && shift && "$@"' _ "$dir" "$@"
 }
 
+# Si el reloj del servidor está desfasado, apt rechaza los repositorios ("Release file ... is not valid yet").
+# Se sincroniza la hora por NTP (chrony) y se reintenta.
+fix_clock() {
+  warn "apt falló; suele deberse a que el reloj del servidor está desfasado. Sincronizando la hora (NTP)…"
+  run timedatectl set-ntp true || true
+  run apt-get install -y chrony || true
+  run systemctl enable --now chrony || true
+  if [ "$DRY" -eq 0 ]; then sleep 5; chronyc makestep || true; fi
+  [ "$DRY" -eq 1 ] || info "Hora del servidor ahora: $(date '+%F %T %Z')"
+}
+
 usage() { sed -n '2,24p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
 # ---------- argumentos ----------
@@ -55,7 +71,9 @@ while [ $# -gt 0 ]; do
     --admin-email)  ADMIN_EMAIL="${2:-}"; shift 2 ;;
     --user)         APP_USER="${2:-}"; shift 2 ;;
     --no-https)     HTTPS=0; shift ;;
+    --firewall)     FIREWALL=1; shift ;;
     --no-firewall)  FIREWALL=0; shift ;;
+    --auto-updates) AUTO_UPDATES=1; shift ;;
     --update)       UPDATE=1; shift ;;
     --dry-run)      DRY=1; shift ;;
     -h|--help)      usage; exit 0 ;;
@@ -98,10 +116,20 @@ if [ "$UPDATE" -eq 1 ]; then
 fi
 
 # ---------- 2) paquetes del sistema ----------
-step "Instalando paquetes del sistema (nginx, PostgreSQL, certbot, ufw…)"
+step "Instalando paquetes del sistema (solo los que falten: nginx, PostgreSQL, certbot…)"
 export DEBIAN_FRONTEND=noninteractive
-run apt-get update -y
-run apt-get install -y curl git ca-certificates gnupg nginx postgresql postgresql-client ufw certbot python3-certbot-nginx cron unattended-upgrades
+if ! run apt-get update -y; then
+  fix_clock
+  run apt-get update -y || die "apt no pudo actualizar la lista de paquetes. Revisa la hora del servidor (date) y la conexión a internet, y repite."
+fi
+# --no-upgrade: si nginx o PostgreSQL ya están instalados NO se actualizan (una actualización los reiniciaría y
+# cortaría un instante tus otras aplicaciones).
+PKGS=(curl git ca-certificates gnupg nginx postgresql postgresql-client cron)
+# Si ya tienes certbot (apt o snap) se usa ese; no se instala otro encima.
+command -v certbot >/dev/null 2>&1 || PKGS+=(certbot python3-certbot-nginx)
+[ "$FIREWALL" -eq 1 ] && PKGS+=(ufw)
+[ "$AUTO_UPDATES" -eq 1 ] && PKGS+=(unattended-upgrades)
+run apt-get install -y --no-upgrade "${PKGS[@]}"
 run systemctl enable --now postgresql
 run systemctl enable --now nginx
 info "Paquetes listos"
@@ -112,7 +140,7 @@ if command -v node >/dev/null 2>&1 && [ "$(node -p 'process.versions.node.split(
   info "Ya está instalado: $(node -v)"
 else
   run bash -c "curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash -"
-  run apt-get install -y nodejs
+  run apt-get install -y --no-upgrade nodejs
   [ "$DRY" -eq 1 ] || info "Instalado: $(node -v)"
 fi
 NODE_BIN="$(command -v node || echo /usr/bin/node)"
@@ -158,7 +186,19 @@ SITE=/etc/nginx/sites-available/paragon
 if [ "$DRY" -eq 0 ] && [ -f "$SITE" ]; then
   info "La configuración de nginx ya existe: no se toca (conserva el HTTPS)"
 else
-  if [ -n "$DOMAIN" ]; then SERVER_NAME="$DOMAIN"; LISTEN_EXTRA=""; else SERVER_NAME="_"; LISTEN_EXTRA=" default_server"; fi
+  LISTEN_EXTRA=""
+  if [ -n "$DOMAIN" ]; then
+    SERVER_NAME="$DOMAIN"   # con dominio, nginx elige este sitio por el nombre: los demás sitios no se tocan
+  else
+    SERVER_NAME="_"
+    # Sin dominio atiende las visitas por IP. Solo se marca "default_server" si ningún otro sitio ya lo es.
+    OTHER_DEFAULT="$(grep -rlE 'listen[^;]*default_server' /etc/nginx/sites-enabled /etc/nginx/conf.d 2>/dev/null | grep -v '/sites-enabled/default$' || true)"
+    if [ -n "$OTHER_DEFAULT" ]; then
+      warn "Ya hay otro sitio de nginx como «default_server» ($OTHER_DEFAULT): no se pisa. Para publicar esta web usa --domain."
+    else
+      LISTEN_EXTRA=" default_server"
+    fi
+  fi
   write_file "$SITE" <<EOF
 # Generado por install.sh. Si el puerto de la app cambia, deploy/sync-nginx-port.sh ajusta "proxy_pass" solo.
 server {
@@ -183,7 +223,9 @@ server {
     }
 }
 EOF
-  run rm -f /etc/nginx/sites-enabled/default
+  # Solo se retira el sitio de bienvenida de Debian cuando esta web va a ser el sitio por defecto (instalación sin dominio).
+  # Con dominio NO se toca ningún sitio existente.
+  if [ -n "$LISTEN_EXTRA" ] && [ -L /etc/nginx/sites-enabled/default ]; then run rm -f /etc/nginx/sites-enabled/default; fi
   run ln -sf "$SITE" /etc/nginx/sites-enabled/paragon
   run nginx -t
   run systemctl reload nginx
@@ -239,7 +281,8 @@ if [ "$DRY" -eq 0 ]; then
 fi
 
 # ---------- 9) HTTPS ----------
-URL="http://${DOMAIN:-$(hostname -I 2>/dev/null | awk '{print $1}')}"
+SERVER_IP="$(hostname -I 2>/dev/null | awk '{print $1}' || true)"
+URL="http://${DOMAIN:-${SERVER_IP:-IP_DEL_SERVIDOR}}"
 if [ -n "$DOMAIN" ] && [ "$HTTPS" -eq 1 ]; then
   step "HTTPS con Let's Encrypt para $DOMAIN"
   PUBLIC_IP="$(curl -fsS --max-time 8 https://api.ipify.org 2>/dev/null || true)"
@@ -257,6 +300,8 @@ if [ -n "$DOMAIN" ] && [ "$HTTPS" -eq 1 ]; then
 fi
 
 # ---------- 10) firewall ----------
+# Por defecto NO se activa el firewall: en un servidor con otras aplicaciones podría cortar puertos que ya usas.
+# Solo con --firewall (servidor nuevo) se activa dejando abiertos únicamente SSH, 80 y 443.
 if [ "$FIREWALL" -eq 1 ]; then
   step "Firewall (ufw)"
   SSH_PORT="$(sshd -T 2>/dev/null | awk '/^port /{print $2; exit}' || true)"
@@ -266,6 +311,13 @@ if [ "$FIREWALL" -eq 1 ]; then
   run ufw allow 443/tcp
   run ufw --force enable
   info "Abiertos: SSH ($SSH_PORT), 80 y 443"
+elif command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -q "Status: active"; then
+  step "Firewall (ufw ya activo)"
+  run ufw allow 80/tcp
+  run ufw allow 443/tcp
+  info "Se aseguró que 80 y 443 estén abiertos (no se cambió nada más)"
+else
+  info "Firewall: no se modificó"
 fi
 
 # ---------- 11) respaldos y actualizaciones de seguridad ----------
@@ -280,11 +332,14 @@ else
   crontab -u "$APP_USER" "$CRON_TMP"
   rm -f "$CRON_TMP"
 fi
-write_file /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
+info "Respaldo a las 04:30 (últimos 14 días en /var/backups/paragon)"
+if [ "$AUTO_UPDATES" -eq 1 ]; then
+  write_file /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 EOF
-info "Respaldo a las 04:30 (últimos 14 días en /var/backups/paragon) y parches de seguridad automáticos"
+  info "Parches de seguridad automáticos activados"
+fi
 
 # ---------- resumen ----------
 printf '\n%s============================================================%s\n' "$G" "$N"
