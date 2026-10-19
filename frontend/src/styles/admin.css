@@ -262,3 +262,9 @@
 .temp-pass__row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .temp-pass code { font-family: Consolas, 'Courier New', monospace; font-size: 1.3rem; color: var(--gold); letter-spacing: .05em; background: var(--bg); padding: 6px 12px; border-radius: 8px; }
 .temp-pass small { color: var(--muted); }
+
+/* ---------- Registro de envíos de correo ---------- */
+.mail-summary { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+.mail-log { max-height: 380px; overflow-y: auto; margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; }
+.mail-log .table { min-width: 720px; }
+.mail-log__detail { color: var(--muted); font-size: .82rem; max-width: 380px; overflow-wrap: anywhere; }

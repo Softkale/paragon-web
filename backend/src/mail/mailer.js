@@ -96,8 +96,19 @@ function generatePassword(length = 12) {
   return Array.from({ length }, () => chars[crypto.randomInt(chars.length)]).join('');
 }
 
+// Anota cada envío en el registro (sin el contenido ni las contraseñas). Nunca lanza: el registro no debe romper el envío.
+async function logMail({ to, kind, subject, status, detail }) {
+  try {
+    await db.query('INSERT INTO mail_log (to_email, kind, subject, status, detail) VALUES ($1, $2, $3, $4, $5)', [to, kind, subject, status, String(detail || '').slice(0, 500)]);
+    if (Math.random() < 0.05) await db.query("DELETE FROM mail_log WHERE created_at < now() - interval '90 days'"); // conserva 90 días
+  } catch (err) {
+    console.error('[mail] No se pudo anotar en el registro:', err.message);
+  }
+}
+
 // Sin SMTP configurado, el correo se guarda en backend/outbox para revisarlo.
-async function deliver({ to, subject, html, text }) {
+// Cada intento queda en el registro: enviado (el servidor SMTP lo aceptó), fallo o sin_smtp (no se envió).
+async function deliver({ to, subject, html, text, kind = 'otro' }) {
   const c = await readConfig();
   if (!c.host) {
     fs.mkdirSync(OUTBOX, { recursive: true });
@@ -105,11 +116,28 @@ async function deliver({ to, subject, html, text }) {
     const inlineLogo = `data:image/jpeg;base64,${fs.readFileSync(LOGO.path).toString('base64')}`;
     fs.writeFileSync(file, html.replace('cid:paragon-logo', inlineLogo));
     console.log(`[mail] SMTP no configurado. Correo para ${to} guardado en ${file}`);
+    await logMail({ to, kind, subject, status: 'sin_smtp', detail: 'SMTP sin configurar: el mensaje no se envió (quedó guardado en backend/outbox).' });
     return { sent: false, saved: file, smtpConfigured: false };
   }
-  if (c.passError) throw new Error(c.passError);
-  await transporterFor(c).sendMail({ from: c.from || c.user, to, subject, html, text, attachments: [LOGO] });
-  return { sent: true, smtpConfigured: true };
+  try {
+    if (c.passError) throw new Error(c.passError);
+    const info = await transporterFor(c).sendMail({ from: c.from || c.user, to, subject, html, text, attachments: [LOGO] });
+    const accepted = (info.accepted || []).length > 0;
+    const detail = accepted
+      ? `${info.response || 'aceptado por el servidor'}${info.messageId ? ` · id ${info.messageId}` : ''}`
+      : `El servidor rechazó al destinatario: ${(info.rejected || []).join(', ') || to}`;
+    console.log(`[mail] ${accepted ? 'enviado' : 'RECHAZADO'} a ${to} (${kind}): ${info.response || ''}`);
+    await logMail({ to, kind, subject, status: accepted ? 'enviado' : 'fallo', detail });
+    if (!accepted) throw new Error(detail);
+    return { sent: true, smtpConfigured: true };
+  } catch (err) {
+    if (!err.logged) {
+      await logMail({ to, kind, subject, status: 'fallo', detail: explainMailError(err) });
+      console.error(`[mail] FALLÓ el envío a ${to} (${kind}): ${err.message}`);
+    }
+    err.logged = true;
+    throw err;
+  }
 }
 
 // Envía los accesos. Nunca lanza: devuelve { sent, smtpConfigured, error } para que el alta no se pierda si falla el correo.
@@ -117,9 +145,8 @@ async function sendCredentials({ to, name, username, password, reset }) {
   const { appUrl } = await readConfig();
   const mail = credentialsEmail({ name, username, password, loginUrl: `${appUrl}/login`, reset });
   try {
-    return await deliver({ to, ...mail });
+    return await deliver({ to, ...mail, kind: reset ? 'reseteo' : 'accesos' });
   } catch (err) {
-    console.error('[mail] Error al enviar:', err.message);
     return { sent: false, smtpConfigured: true, error: explainMailError(err) };
   }
 }
@@ -128,7 +155,7 @@ async function sendCredentials({ to, name, username, password, reset }) {
 async function sendTest(to) {
   const mail = testEmail();
   try {
-    return await deliver({ to, ...mail });
+    return await deliver({ to, ...mail, kind: 'prueba' });
   } catch (err) {
     return { sent: false, smtpConfigured: true, error: explainMailError(err) };
   }
@@ -139,9 +166,8 @@ async function sendReset({ to, name, token }) {
   const { appUrl } = await readConfig();
   const mail = resetEmail({ name, resetUrl: `${appUrl}/restablecer?token=${token}` });
   try {
-    return await deliver({ to, ...mail });
+    return await deliver({ to, ...mail, kind: 'recuperacion' });
   } catch (err) {
-    console.error('[mail] Error al enviar el enlace de recuperación:', err.message);
     return { sent: false, smtpConfigured: true, error: explainMailError(err) };
   }
 }

@@ -387,6 +387,39 @@ su paragon -c "npm run admin:create -- --name TuUsuario --email tucorreo@dominio
 
 Deja la cuenta como admin **activo** con una clave temporal nueva.
 
+## Comprobar que los correos salen
+
+**1. Desde la web (lo más fácil):** *Configuración → Correo (SMTP)*.
+- **«Enviar correo de prueba»** a tu propio correo: si falla, el mensaje dice por qué (clave incorrecta, servidor que no
+  responde, puerto o SSL mal elegido…).
+- **«Registro de envíos»** (más abajo en la misma pantalla): cada correo que sale del sistema (accesos, reseteos,
+  recuperaciones y pruebas) con su fecha, destinatario y estado:
+
+  | Estado | Qué significa |
+  |---|---|
+  | **Enviado** | El servidor de correo **aceptó** el mensaje (se muestra su respuesta, ej. `250 OK queued`). No garantiza que llegue a la bandeja principal |
+  | **Falló** | No salió o el servidor rechazó al destinatario. El detalle dice el motivo |
+  | **No enviado** | El SMTP no está configurado: el mensaje solo quedó guardado en `backend/outbox` |
+
+  Se muestran los últimos 100 y se conservan 90 días. **No se guarda el contenido** de los correos ni las contraseñas
+  temporales, solo el destinatario, el tipo, el asunto y el resultado.
+
+**2. Desde el servidor:** cada envío también queda en el registro del servicio:
+
+```bash
+journalctl -u paragon -f | grep --line-buffered '\[mail\]'     # en vivo
+journalctl -u paragon --since today | grep '\[mail\]'           # lo de hoy
+```
+
+**3. Si dice «Enviado» pero el usuario no lo ve:**
+- Pídele que revise la carpeta de **spam**, y confirma que su correo esté bien escrito (*Miembros → ✏️ Editar*).
+- Usa un **remitente de tu propio dominio** (ej. `PARAGON <no-reply@paragon.lat>`) y, si es posible, el mismo servicio
+  que gestiona ese dominio. Los remitentes de Gmail/Hotmail enviados desde otro servidor suelen caer en spam.
+- Configura en el DNS del dominio los registros **SPF, DKIM y DMARC** (los da tu proveedor de correo). Sin ellos,
+  Gmail y Outlook desconfían de los mensajes.
+- Muchos VPS **bloquean el puerto 25**; usa siempre **587** (STARTTLS, «Conexión segura» apagada) o **465** (activada).
+- Para ver por qué un mensaje cayó en spam, en Gmail: abrir el correo → ⋮ → *Mostrar original* (indica si SPF/DKIM pasan).
+
 ## Problemas frecuentes
 
 | Síntoma | Causa y solución |

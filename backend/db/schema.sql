@@ -145,3 +145,16 @@ CREATE TABLE IF NOT EXISTS password_resets (
   used_at    TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- ---------- Registro de envíos de correo ----------
+-- Solo destinatario, tipo, asunto, estado y detalle: nunca el contenido ni las contraseñas temporales.
+CREATE TABLE IF NOT EXISTS mail_log (
+  id         SERIAL PRIMARY KEY,
+  to_email   VARCHAR(200) NOT NULL,
+  kind       VARCHAR(20)  NOT NULL,
+  subject    VARCHAR(200) NOT NULL,
+  status     VARCHAR(10)  NOT NULL CHECK (status IN ('enviado', 'fallo', 'sin_smtp')),
+  detail     TEXT,
+  created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mail_log_created ON mail_log (created_at DESC);

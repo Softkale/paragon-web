@@ -7,6 +7,13 @@ const PRESETS = [
   { label: 'SSL (puerto 465)', port: 465, secure: true },
 ];
 
+const KIND = { prueba: 'Prueba', accesos: 'Accesos', reseteo: 'Reseteo de clave', recuperacion: 'Recuperación', otro: 'Otro' };
+const STATUS = {
+  enviado: { label: 'Enviado', cls: 'activo' },
+  fallo: { label: 'Falló', cls: 'rechazado' },
+  sin_smtp: { label: 'No enviado', cls: 'pendiente' },
+};
+
 // Configuración del correo (SMTP) desde la web. Solo el admin entra aquí.
 function MailSettings() {
   const [cfg, setCfg] = useState(null);
@@ -16,13 +23,16 @@ function MailSettings() {
   const [testTo, setTestTo] = useState('');
   const [test, setTest] = useState(null);
   const [testing, setTesting] = useState(false);
+  const [log, setLog] = useState(null);
+
+  const loadLog = () => api.get('/settings/mail/log').then(setLog).catch(() => {});
 
   const apply = (c) => {
     setCfg(c);
     setForm({ host: c.host, port: c.port, secure: c.secure, user: c.user, pass: '', clearPass: false, from: c.from, appUrl: c.appUrl });
   };
 
-  useEffect(() => { api.get('/settings/mail').then(apply).catch((e) => setMsg({ ok: false, text: e.message })); }, []);
+  useEffect(() => { api.get('/settings/mail').then(apply).catch((e) => setMsg({ ok: false, text: e.message })); loadLog(); }, []);
 
   if (!form) return <div className="card empty">{msg ? msg.text : 'Cargando…'}</div>;
 
@@ -52,6 +62,7 @@ function MailSettings() {
       setTest({ sent: false, error: err.message });
     } finally {
       setTesting(false);
+      loadLog();
     }
   };
 
@@ -113,6 +124,45 @@ function MailSettings() {
           : <p className="form-msg form-msg--error" style={{ marginTop: 12 }}>
               {test.smtpConfigured === false ? 'No hay servidor SMTP configurado: el mensaje se guardó en backend/outbox y no se envió.' : `No se pudo enviar: ${test.error}`}
             </p>
+      )}
+
+      <div className="toolbar" style={{ marginTop: 28 }}>
+        <h4 className="control-sub" style={{ margin: 0 }}>Registro de envíos</h4>
+        <button className="icon-btn" onClick={loadLog}>↻ Actualizar</button>
+      </div>
+      {log && (
+        <>
+          <div className="mail-summary">
+            <span className="status status--activo">{log.last24h.enviado} enviados</span>
+            <span className="status status--rechazado">{log.last24h.fallo} con fallo</span>
+            <span className="status status--pendiente">{log.last24h.sin_smtp} sin enviar (SMTP sin configurar)</span>
+            <small className="muted">últimas 24 horas</small>
+          </div>
+          {!log.rows.length ? (
+            <p className="muted" style={{ marginTop: 10 }}>Aún no hay envíos registrados. Envía un correo de prueba para ver el primero.</p>
+          ) : (
+            <div className="table-wrap mail-log">
+              <table className="table">
+                <thead><tr><th>Fecha</th><th>Destinatario</th><th>Tipo</th><th>Estado</th><th>Detalle</th></tr></thead>
+                <tbody>
+                  {log.rows.map((r) => (
+                    <tr key={r.id}>
+                      <td>{new Date(r.created_at).toLocaleString('es', { hour12: false })}</td>
+                      <td>{r.to_email}</td>
+                      <td><span className="tag">{KIND[r.kind] || r.kind}</span></td>
+                      <td><span className={`status status--${STATUS[r.status].cls}`}>{STATUS[r.status].label}</span></td>
+                      <td className="mail-log__detail">{r.detail || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="muted settings-note" style={{ marginTop: 10 }}>
+            «Enviado» significa que el servidor de correo <b>aceptó</b> el mensaje; no garantiza que llegue a la bandeja principal.
+            Si alguien dice que no le llegó: revisa su carpeta de spam y que el correo esté bien escrito (Miembros → Editar).
+          </p>
+        </>
       )}
 
       <p className="muted settings-note">

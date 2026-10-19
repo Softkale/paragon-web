@@ -39,4 +39,15 @@ router.post('/mail/test', async (req, res) => {
   res.json({ sent: result.sent, smtpConfigured: result.smtpConfigured, error: result.error || null });
 });
 
+// Historial de envíos (últimos 100) y resumen de las últimas 24 horas.
+router.get('/mail/log', async (_req, res) => {
+  const db = require('../db');
+  const [rows, summary] = await Promise.all([
+    db.query('SELECT id, to_email, kind, subject, status, detail, created_at FROM mail_log ORDER BY id DESC LIMIT 100'),
+    db.query("SELECT status, count(*)::int AS n FROM mail_log WHERE created_at > now() - interval '24 hours' GROUP BY status"),
+  ]);
+  const last24h = { enviado: 0, fallo: 0, sin_smtp: 0, ...Object.fromEntries(summary.rows.map((r) => [r.status, r.n])) };
+  res.json({ last24h, rows: rows.rows });
+});
+
 module.exports = router;
