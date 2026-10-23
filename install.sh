@@ -98,8 +98,8 @@ else
 fi
 info "Carpeta del proyecto: $APP_DIR"
 
-# Si falta el usuario/correo del admin y hay terminal, los pregunta.
-if [ -z "$ADMIN_NAME" ] && [ "$DRY" -eq 0 ] && [ -t 0 ]; then
+# Si falta el usuario/correo del admin y hay terminal, los pregunta. No en una actualización ni si ya hay instalación (.env): el admin ya existe.
+if [ -z "$ADMIN_NAME" ] && [ "$DRY" -eq 0 ] && [ "$UPDATE" -eq 0 ] && [ ! -f "$APP_DIR/backend/.env" ] && [ -t 0 ]; then
   read -r -p "   Usuario para el primer administrador: " ADMIN_NAME
   read -r -p "   Correo del administrador: " ADMIN_EMAIL
 fi
