@@ -7,7 +7,7 @@ const { sendCredentials, generatePassword, isSmtpConfigured } = require('../mail
 const router = express.Router();
 router.use(requireAuth, requireRole('oficial'));
 
-const COLUMNS = 'id, character_name, email, character_class, role, status, created_at, must_change_password, invited_at, registered_at';
+const COLUMNS = 'id, character_name, email, character_class, role, status, created_at, must_change_password, invited_at, registered_at, records_attendance';
 
 // El admin gestiona a todos; el oficial solo a miembros.
 const canManage = (actor, targetRole) => actor.role === 'admin' || targetRole === 'miembro';
@@ -237,6 +237,20 @@ router.patch('/:id/status', async (req, res) => {
     `UPDATE users SET status = $1 WHERE id = $2 RETURNING ${COLUMNS}`,
     [status, req.params.id]
   );
+  res.json(rows[0]);
+});
+
+// Solo admin: designa (o retira) al oficial que anota la asistencia a las invasiones.
+router.patch('/:id/recorder', requireRole('admin'), async (req, res) => {
+  const enabled = req.body?.enabled;
+  if (typeof enabled !== 'boolean') return res.status(400).json({ error: 'Dato inválido' });
+  const target = await db.query('SELECT role, status FROM users WHERE id = $1', [req.params.id]);
+  const user = target.rows[0];
+  if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+  if (enabled && (user.role !== 'oficial' || user.status !== 'activo')) {
+    return res.status(400).json({ error: 'Solo se puede designar a un oficial activo' });
+  }
+  const { rows } = await db.query(`UPDATE users SET records_attendance = $1 WHERE id = $2 RETURNING ${COLUMNS}`, [enabled, req.params.id]);
   res.json(rows[0]);
 });
 

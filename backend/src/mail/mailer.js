@@ -84,6 +84,8 @@ function transporterFor(c) {
         host: c.host, port: c.port, secure: c.secure,
         auth: c.user ? { user: c.user, pass: c.pass } : undefined,
         name: heloName(c.appUrl),
+        // Hacia el servidor de correo del propio equipo (127.0.0.1) no hace falta cifrar: no sale a la red.
+        ignoreTLS: ['127.0.0.1', 'localhost', '::1'].includes(c.host),
         connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 20000,
       }),
     };

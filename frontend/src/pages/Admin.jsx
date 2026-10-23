@@ -238,6 +238,7 @@ function Members({ me }) {
                         <option value="admin">admin</option>
                       </select>
                     ) : <span className="tag" title={u.id === me.id ? 'No puedes cambiar tu propio rol' : undefined}>{u.role}{u.id === me.id ? ' (tú)' : ''}</span>}
+                    {u.role === 'oficial' && u.records_attendance && <span className="tag" title="Anota la asistencia a las invasiones"> 📝 asistencia</span>}
                   </td>
                   <td><StatusBadge status={u.status} /></td>
                   <td><AccessBadge user={u} /></td>
@@ -245,6 +246,11 @@ function Members({ me }) {
                   <td className="actions">
                     {(isAdmin || u.role === 'miembro') && (
                       <button className="icon-btn" title="Editar datos y resetear clave" onClick={() => setEditing(u)}>✏️ Editar</button>
+                    )}
+                    {isAdmin && u.role === 'oficial' && u.status === 'activo' && (
+                      <button className="icon-btn" title="El oficial designado es quien anota qué PJ asistió a cada invasión" onClick={() => run(() => api.patch(`/users/${u.id}/recorder`, { enabled: !u.records_attendance }))}>
+                        {u.records_attendance ? 'Quitar asistencia' : 'Designar asistencia'}
+                      </button>
                     )}
                     {!locked && (
                       <button className="icon-btn" onClick={() => run(() => api.patch(`/users/${u.id}/status`, { status: u.status === 'activo' ? 'inactivo' : 'activo' }))}>
@@ -301,7 +307,7 @@ export default function Admin() {
             </button>
           ))}
         </nav>
-        <Link to="/invasiones" className="sidebar__logout">⏱️ Marcar mi asistencia</Link>
+        <Link to="/invasiones" className="sidebar__logout">⏱️ Mi reporte</Link>
         <button className="sidebar__logout" onClick={() => { logout(); history.push('/login'); }}>Cerrar sesión</button>
       </aside>
 

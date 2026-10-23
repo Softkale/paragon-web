@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api';
-import CheckinControl from '../components/CheckinControl';
 import LootEntry from '../components/LootEntry';
 import DaySheet from '../components/DaySheet';
+import AttendanceLog from '../components/AttendanceLog';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (s, n) => {
@@ -34,6 +34,13 @@ function SeasonForm({ initial, onSave, onCancel, title }) {
   return (
     <form className="card form-grid" onSubmit={submit} style={{ marginBottom: 20 }}>
       <h3 className="admin-h field--wide" style={{ margin: 0 }}>{title}</h3>
+      <label className="field">
+        <span>Tipo</span>
+        <select className="select" value={form.kind} onChange={set('kind')}>
+          <option value="liga">Liga</option>
+          <option value="libre">Sin liga (las invasiones continúan)</option>
+        </select>
+      </label>
       <label className="field"><span>Nombre</span><input value={form.name} onChange={set('name')} required /></label>
       <label className="field"><span>Inicio</span><input type="date" value={form.start_date} onChange={set('start_date')} required /></label>
       <label className="field">
@@ -103,7 +110,7 @@ export default function Invasions({ me }) {
   };
 
   const removeSeason = () => run(async () => {
-    if (!window.confirm('¿Eliminar esta temporada con todas sus asistencias y botín?')) return;
+    if (!window.confirm('¿Eliminar este período con todas sus asistencias y botín?')) return;
     await api.del(`/seasons/${selected}`);
     const list = await api.get('/seasons');
     setSeasons(list);
@@ -119,6 +126,7 @@ export default function Invasions({ me }) {
 
   const last = seasons[0]; // la lista llega ordenada por inicio descendente
   const newDefaults = {
+    kind: 'liga',
     name: `Temporada ${seasons.length + 1}`,
     start_date: last ? addDays(last.end_date, 1) : today(),
     weeks: 2,
@@ -127,42 +135,44 @@ export default function Invasions({ me }) {
 
   return (
     <>
-      <CheckinControl />
       <div className="toolbar">
         <div className="season-pick">
           {seasons.length > 0 && (
             <select className="select" value={selected || ''} onChange={(e) => { setSelected(Number(e.target.value)); setForm(null); }}>
               {seasons.map((s) => (
-                <option key={s.id} value={s.id}>{s.name} · {fmtRange(s)}</option>
+                <option key={s.id} value={s.id}>{s.kind === 'libre' ? '[Sin liga] ' : ''}{s.name} · {fmtRange(s)}</option>
               ))}
             </select>
           )}
-          {current && <span className="tag">{current.weeks} {current.weeks === 1 ? 'semana' : 'semanas'}</span>}
+          {current && <span className="tag">{current.kind === 'libre' ? 'Sin liga · ' : ''}{current.weeks} {current.weeks === 1 ? 'semana' : 'semanas'}</span>}
         </div>
         <div className="form-actions">
           {current && <button className="icon-btn" onClick={() => setForm(form === 'edit' ? null : 'edit')}>✏️ Editar</button>}
           {current && me.role === 'admin' && <button className="icon-btn" onClick={removeSeason}>🗑️</button>}
-          <button className="btn btn--sm" onClick={() => setForm(form === 'new' ? null : 'new')}>+ Nueva temporada</button>
+          <button className="btn btn--sm" onClick={() => setForm(form === 'new' ? null : 'new')}>+ Nuevo período</button>
         </div>
       </div>
 
-      {form === 'new' && <SeasonForm title="Nueva temporada" initial={newDefaults} onSave={saveSeason} onCancel={() => setForm(null)} />}
+      {form === 'new' && <SeasonForm title="Nuevo período (liga o sin liga)" initial={newDefaults} onSave={saveSeason} onCancel={() => setForm(null)} />}
       {form === 'edit' && current && (
         <SeasonForm
           title="Editar temporada"
-          initial={{ name: current.name, start_date: current.start_date, weeks: String(current.weeks) }}
+          initial={{ name: current.name, kind: current.kind, start_date: current.start_date, weeks: String(current.weeks) }}
           onSave={saveSeason}
           onCancel={() => setForm(null)}
         />
       )}
       {error && <div className="form-msg form-msg--error" style={{ marginBottom: 16 }}>{error}</div>}
 
-      {!current && <div className="card empty">Aún no hay temporadas. Crea la primera con «+ Nueva temporada».</div>}
+      {!current && <div className="card empty">Aún no hay temporadas ni períodos sin liga. Crea el primero con «+ Nuevo período».</div>}
 
       {current && sheet && (
         <>
           <h3 className="admin-h">Asistencia a invasiones <small className="muted">· 12:00, 17:00 y 21:00 (hora de Perú), todos los días</small></h3>
-          {day && <DaySheet key={current.id} sheet={sheet} seasonId={current.id} day={day} setDay={setDay} onChanged={() => loadSheet(selected)} />}
+          {day && <DaySheet key={current.id} canRecord={!!me.canRecord} sheet={sheet} seasonId={current.id} day={day} setDay={setDay} onChanged={() => loadSheet(selected)} />}
+
+          <h3 className="admin-h" style={{ marginTop: 32 }}>Historial de registros <small className="muted">· quién anotó o quitó cada asistencia</small></h3>
+          <AttendanceLog seasonId={current.id} version={sheet.checks.length} />
 
           <h3 className="admin-h" style={{ marginTop: 32 }}>Botín por invasión</h3>
           {day && <LootEntry key={`${current.id}-${sheet.days[0]}`} sheet={sheet} seasonId={current.id} day={day} onSaved={() => loadSheet(selected)} />}

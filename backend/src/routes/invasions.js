@@ -1,108 +1,55 @@
 const express = require('express');
 const db = require('../db');
-const { requireAuth, requireRole } = require('../middleware/auth');
-const { SLOTS, getSettings, validTimezone, nowIn, slotState, seasonOn, localizeSlot } = require('../lib/schedule');
+const { requireAuth } = require('../middleware/auth');
+const { allocate } = require('../lib/allocation');
 const { seasonEnd } = require('../lib/dates');
+const { SLOTS, LOOT_NAMES, getSettings, nowIn } = require('../lib/schedule');
 
 const router = express.Router();
 router.use(requireAuth);
 
-// Estado de las invasiones de hoy para el usuario que consulta.
-router.get('/status', async (req, res) => {
-  const settings = await getSettings();
-  const now = nowIn(settings.timezone);
-  const season = await seasonOn(now.day);
+const sum = (arr) => arr.reduce((a, b) => a + b, 0);
 
-  const me = await db.query('SELECT timezone FROM users WHERE id = $1', [req.user.id]);
-  const userTz = me.rows[0]?.timezone || settings.timezone;
-
-  const [overrides, mine, total] = await Promise.all([
-    db.query('SELECT slot, state FROM invasion_overrides WHERE day = $1', [now.day]),
-    season
-      ? db.query('SELECT day, slot FROM invasion_attendance WHERE season_id = $1 AND user_id = $2', [season.id, req.user.id])
-      : { rows: [] },
-    Promise.resolve(season ? SLOTS.length * 7 * season.weeks : 0),
+// Reporte personal: por cada temporada (o período sin liga), a qué invasiones asistió el usuario
+// y cuántas cajas le tocan según el reparto. La asistencia la anota el oficial designado, así que
+// ya puede haber datos de la persona desde antes de que completara su registro.
+router.get('/mine', async (req, res) => {
+  const me = req.user.id;
+  const [seasons, att, loot, delivered] = await Promise.all([
+    db.query('SELECT * FROM seasons ORDER BY start_date DESC'),
+    db.query('SELECT season_id, user_id, day, slot FROM invasion_attendance'),
+    db.query('SELECT season_id, category, quantity FROM season_loot'),
+    db.query('SELECT season_id FROM season_delivery WHERE user_id = $1', [me]),
   ]);
-  const overrideOf = Object.fromEntries(overrides.rows.map((o) => [o.slot.trim(), o.state]));
-  const checkedToday = new Set(mine.rows.filter((a) => a.day === now.day).map((a) => a.slot.trim()));
+  const { day: today } = nowIn((await getSettings()).timezone);
+  const deliveredSet = new Set(delivered.rows.map((d) => d.season_id));
 
-  res.json({
-    now: { day: now.day, seconds: now.seconds },
-    timezone: settings.timezone,
-    userTimezone: me.rows[0]?.timezone || null,
-    minutes: settings.checkin_minutes,
-    season: season && { ...season, end_date: seasonEnd(season.start_date, season.weeks) },
-    slots: SLOTS.map((slot) => ({
-      slot,
-      override: overrideOf[slot] || null,
-      checked: checkedToday.has(slot),
-      ...localizeSlot(now.day, slot, settings.timezone, userTz),
-      ...slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds, override: overrideOf[slot] }),
-    })),
-    mine: { count: mine.rows.length, opportunities: total },
+  const report = seasons.rows.map((s) => {
+    const end = seasonEnd(s.start_date, s.weeks);
+    const rows = att.rows.filter((a) => a.season_id === s.id);
+    const counts = {};
+    rows.forEach((a) => { counts[a.user_id] = (counts[a.user_id] || 0) + 1; });
+    const roster = Object.entries(counts).map(([id, count]) => ({ id: Number(id), count, name: String(id) }));
+
+    const inventory = Array(LOOT_NAMES.length).fill(0);
+    loot.rows.filter((l) => l.season_id === s.id).forEach((l) => { inventory[l.category] += l.quantity; });
+    const boxes = inventory.map((n) => allocate(n, roster)[me] || 0);
+
+    const mine = rows.filter((a) => a.user_id === me);
+    const bySlot = Object.fromEntries(SLOTS.map((slot) => [slot, 0]));
+    mine.forEach((a) => { bySlot[a.slot.trim()] += 1; });
+    const opportunities = SLOTS.length * 7 * s.weeks;
+
+    return {
+      id: s.id, name: s.name, kind: s.kind, start_date: s.start_date, end_date: end, weeks: s.weeks,
+      current: s.start_date <= today && today <= end,
+      attendances: mine.length, opportunities, bySlot,
+      attended: mine.map((a) => ({ day: a.day, slot: a.slot.trim() })).sort((a, b) => b.day.localeCompare(a.day) || b.slot.localeCompare(a.slot)),
+      boxes, totalBoxes: sum(boxes), delivered: deliveredSet.has(s.id),
+    };
   });
-});
 
-// El miembro marca su propia asistencia, solo si la invasión está dentro de su ventana.
-router.post('/checkin', async (req, res) => {
-  const { slot } = req.body || {};
-  if (!SLOTS.includes(slot)) return res.status(400).json({ error: 'Horario inválido' });
-
-  const user = await db.query(`SELECT 1 FROM users WHERE id = $1 AND status = 'activo'`, [req.user.id]);
-  if (!user.rowCount) return res.status(403).json({ error: 'Tu cuenta no está activa' });
-
-  const settings = await getSettings();
-  const now = nowIn(settings.timezone);
-  const season = await seasonOn(now.day);
-  if (!season) return res.status(409).json({ error: 'No hay una temporada vigente hoy' });
-
-  const ov = await db.query('SELECT state FROM invasion_overrides WHERE day = $1 AND slot = $2', [now.day, slot]);
-  const { state } = slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds, override: ov.rows[0]?.state });
-  if (state === 'upcoming') return res.status(409).json({ error: 'Esta invasión aún no comienza' });
-  if (state === 'closed') return res.status(409).json({ error: 'El tiempo para marcar esta invasión ya terminó' });
-
-  const { rowCount } = await db.query(
-    `INSERT INTO invasion_attendance (season_id, user_id, day, slot, source, marked_by)
-     VALUES ($1, $2, $3, $4, 'self', $2) ON CONFLICT DO NOTHING`,
-    [season.id, req.user.id, now.day, slot]
-  );
-  res.status(rowCount ? 201 : 200).json({ ok: true, alreadyChecked: !rowCount });
-});
-
-// ---------- Configuración (oficial y admin) ----------
-router.get('/settings', requireRole('oficial'), async (_req, res) => res.json(await getSettings()));
-
-router.put('/settings', requireRole('oficial'), async (req, res) => {
-  const minutes = Number(req.body?.checkin_minutes);
-  const { timezone } = req.body || {};
-  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 120) {
-    return res.status(400).json({ error: 'La duración debe ser un entero entre 1 y 120 minutos' });
-  }
-  if (!validTimezone(timezone)) return res.status(400).json({ error: 'Zona horaria inválida (ej. America/Lima)' });
-
-  const save = (key, value) =>
-    db.query('INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value', [key, String(value)]);
-  await save('checkin_minutes', minutes);
-  await save('timezone', timezone);
-  res.json(await getSettings());
-});
-
-// Abre o cierra a mano la invasión de hoy en ese horario; state = null vuelve al horario normal.
-router.put('/override', requireRole('oficial'), async (req, res) => {
-  const { slot, state } = req.body || {};
-  if (!SLOTS.includes(slot) || ![null, 'open', 'closed'].includes(state)) {
-    return res.status(400).json({ error: 'Datos inválidos' });
-  }
-  const { day } = nowIn((await getSettings()).timezone);
-  if (state === null) {
-    await db.query('DELETE FROM invasion_overrides WHERE day = $1 AND slot = $2', [day, slot]);
-  } else {
-    await db.query(
-      'INSERT INTO invasion_overrides (day, slot, state) VALUES ($1, $2, $3) ON CONFLICT (day, slot) DO UPDATE SET state = EXCLUDED.state',
-      [day, slot, state]
-    );
-  }
-  res.status(204).end();
+  res.json({ slots: SLOTS, lootNames: LOOT_NAMES, seasons: report });
 });
 
 module.exports = router;

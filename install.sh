@@ -19,6 +19,8 @@
 #    --email E           correo para el certificado HTTPS (Let's Encrypt)
 #    --admin-name N      usuario del primer administrador          --admin-email C    su correo
 #    --no-https          no pedir certificado
+#    --local-mail        el sistema envía sus propios correos desde este servidor (Postfix + firma DKIM), sin depender
+#                        del SMTP de un hosting ni de servicios externos. Requiere --domain (ver deploy/setup-local-mail.sh)
 #    --firewall          (servidor NUEVO) activa ufw dejando solo SSH, 80 y 443. Por defecto NO se toca el firewall
 #    --auto-updates      (servidor NUEVO) activa los parches de seguridad automáticos
 #    --update            antes de instalar hace "git pull" (si el proyecto es un repositorio Git)
@@ -31,7 +33,7 @@ APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_USER="paragon"
 NODE_MAJOR=22
 DOMAIN=""; EMAIL=""; ADMIN_NAME=""; ADMIN_EMAIL=""
-FIREWALL=0; AUTO_UPDATES=0; HTTPS=1; DRY=0; UPDATE=0
+FIREWALL=0; AUTO_UPDATES=0; LOCAL_MAIL=0; HTTPS=1; DRY=0; UPDATE=0
 
 # ---------- utilidades ----------
 if [ -t 1 ]; then B=$'\033[1m'; G=$'\033[32m'; Y=$'\033[33m'; R=$'\033[31m'; N=$'\033[0m'; else B=""; G=""; Y=""; R=""; N=""; fi
@@ -71,6 +73,7 @@ while [ $# -gt 0 ]; do
     --admin-email)  ADMIN_EMAIL="${2:-}"; shift 2 ;;
     --user)         APP_USER="${2:-}"; shift 2 ;;
     --no-https)     HTTPS=0; shift ;;
+    --local-mail)   LOCAL_MAIL=1; shift ;;
     --firewall)     FIREWALL=1; shift ;;
     --no-firewall)  FIREWALL=0; shift ;;
     --auto-updates) AUTO_UPDATES=1; shift ;;
@@ -304,6 +307,17 @@ if [ -n "$DOMAIN" ] && [ "$HTTPS" -eq 1 ]; then
 fi
 
 # ---------- 10) firewall ----------
+# ---------- 9b) correo de salida propio (opcional) ----------
+if [ "$LOCAL_MAIL" -eq 1 ]; then
+  step "Correo de salida propio (Postfix + firma DKIM)"
+  [ -n "$DOMAIN" ] || die "--local-mail necesita --domain."
+  run bash "$APP_DIR/deploy/setup-local-mail.sh" --domain "$DOMAIN"
+  # PARAGON entrega a 127.0.0.1:25 (sin usuario ni clave); Postfix firma y envía.
+  as_app "$APP_DIR/backend" node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --user "" --clear-pass \
+    --from "PARAGON <no-reply@${DOMAIN}>" --app-url "$URL"
+  info "PARAGON configurado para enviar por 127.0.0.1:25. Falta publicar el DKIM y el DNS inverso (ver arriba)"
+fi
+
 # Por defecto NO se activa el firewall: en un servidor con otras aplicaciones podría cortar puertos que ya usas.
 # Solo con --firewall (servidor nuevo) se activa dejando abiertos únicamente SSH, 80 y 443.
 if [ "$FIREWALL" -eq 1 ]; then

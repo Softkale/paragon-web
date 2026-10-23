@@ -158,3 +158,28 @@ CREATE TABLE IF NOT EXISTS mail_log (
   created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS mail_log_created ON mail_log (created_at DESC);
+
+-- ---------- Registro de asistencia por un oficial designado ----------
+-- Solo los oficiales con este permiso (y el admin) anotan qué PJ asistió a cada invasión; los miembros ya no se marcan solos.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS records_attendance BOOLEAN NOT NULL DEFAULT false;
+
+-- ---------- Períodos sin liga ----------
+-- Las invasiones continúan fuera de la liga: un período 'libre' funciona igual que una temporada
+-- (asistencia, botín y reparto de cajas), pero se identifica aparte.
+ALTER TABLE seasons ADD COLUMN IF NOT EXISTS kind VARCHAR(5) NOT NULL DEFAULT 'liga' CHECK (kind IN ('liga', 'libre'));
+
+-- ---------- Historial de la asistencia ----------
+-- Cada marca o retiro hecho por un oficial. Los nombres se copian para que el rastro sobreviva si se borra un usuario.
+CREATE TABLE IF NOT EXISTS attendance_log (
+  id          SERIAL PRIMARY KEY,
+  season_id   INT REFERENCES seasons(id) ON DELETE CASCADE,
+  action      VARCHAR(6) NOT NULL CHECK (action IN ('marcar', 'quitar')),
+  actor_id    INT REFERENCES users(id) ON DELETE SET NULL,
+  actor_name  VARCHAR(40) NOT NULL,
+  player_id   INT REFERENCES users(id) ON DELETE SET NULL,
+  player_name VARCHAR(40) NOT NULL,
+  day         DATE NOT NULL,
+  slot        CHAR(5) NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS attendance_log_season ON attendance_log (season_id, created_at DESC);

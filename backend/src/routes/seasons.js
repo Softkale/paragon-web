@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('../db');
-const { requireAuth, requireRole } = require('../middleware/auth');
+const { requireAuth, requireRole, requireRecorder } = require('../middleware/auth');
 const { allocate } = require('../lib/allocation');
 const { isDate, seasonEnd, seasonDays } = require('../lib/dates');
 const { SLOTS, LOOT_NAMES, getSettings, nowIn, slotState } = require('../lib/schedule');
@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(requireAuth, requireRole('oficial'));
 
 
+const KINDS = ['liga', 'libre'];
 const withEnd = (s) => ({ ...s, end_date: seasonEnd(s.start_date, s.weeks) });
 
 async function getSeason(id) {
@@ -17,8 +18,9 @@ async function getSeason(id) {
 }
 
 // Valida nombre, fecha y duración; devuelve el error o null.
-async function validateSeason({ name, start_date, weeks }, ignoreId = 0) {
+async function validateSeason({ name, kind, start_date, weeks }, ignoreId = 0) {
   if (!name || !name.trim()) return 'El nombre es obligatorio';
+  if (!KINDS.includes(kind)) return 'Tipo inválido (liga o sin liga)';
   if (!isDate(start_date)) return 'Fecha de inicio inválida';
   if (!Number.isInteger(weeks) || weeks < 1 || weeks > 4) return 'La duración debe ser de 1 a 4 semanas';
 
@@ -35,8 +37,7 @@ async function invasionState(day, slot) {
   const now = nowIn(settings.timezone);
   if (day > now.day) return { when: 'future', state: 'upcoming' };
   if (day < now.day) return { when: 'past', state: 'closed' };
-  const ov = await db.query('SELECT state FROM invasion_overrides WHERE day = $1 AND slot = $2', [day, slot]);
-  return { when: 'today', ...slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds, override: ov.rows[0]?.state }) };
+  return { when: 'today', ...slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds }) };
 }
 
 router.get('/', async (_req, res) => {
@@ -45,12 +46,12 @@ router.get('/', async (_req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const body = { name: req.body?.name, start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
+  const body = { name: req.body?.name, kind: req.body?.kind || 'liga', start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
   const error = await validateSeason(body);
   if (error) return res.status(400).json({ error });
   const { rows } = await db.query(
-    'INSERT INTO seasons (name, start_date, weeks, created_by) VALUES ($1, $2, $3, $4) RETURNING *',
-    [body.name.trim(), body.start_date, body.weeks, req.user.id]
+    'INSERT INTO seasons (name, kind, start_date, weeks, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    [body.name.trim(), body.kind, body.start_date, body.weeks, req.user.id]
   );
   res.status(201).json(withEnd(rows[0]));
 });
@@ -59,7 +60,7 @@ router.put('/:id', async (req, res) => {
   const season = await getSeason(req.params.id);
   if (!season) return res.status(404).json({ error: 'Temporada no encontrada' });
 
-  const body = { name: req.body?.name, start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
+  const body = { name: req.body?.name, kind: req.body?.kind || 'liga', start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
   const error = await validateSeason(body, season.id);
   if (error) return res.status(400).json({ error });
 
@@ -71,8 +72,8 @@ router.put('/:id', async (req, res) => {
   if (orphans.rowCount) return res.status(400).json({ error: 'Hay asistencias registradas fuera del nuevo rango de fechas' });
 
   const { rows } = await db.query(
-    'UPDATE seasons SET name = $1, start_date = $2, weeks = $3 WHERE id = $4 RETURNING *',
-    [body.name.trim(), body.start_date, body.weeks, season.id]
+    'UPDATE seasons SET name = $1, kind = $2, start_date = $3, weeks = $4 WHERE id = $5 RETURNING *',
+    [body.name.trim(), body.kind, body.start_date, body.weeks, season.id]
   );
   res.json(withEnd(rows[0]));
 });
@@ -146,7 +147,7 @@ router.get('/:id/day/:day', async (req, res) => {
   const now = nowIn(settings.timezone);
   const when = day > now.day ? 'future' : day < now.day ? 'past' : 'today';
 
-  const [players, att, overrides] = await Promise.all([
+  const [players, att] = await Promise.all([
     db.query(
       `SELECT id, character_name AS name FROM users
        WHERE status = 'activo' OR id IN (SELECT user_id FROM invasion_attendance WHERE season_id = $1)
@@ -162,9 +163,7 @@ router.get('/:id/day/:day', async (req, res) => {
        ORDER BY a.marked_at`,
       [season.id, day]
     ),
-    db.query('SELECT slot, state FROM invasion_overrides WHERE day = $1', [day]),
   ]);
-  const overrideOf = Object.fromEntries(overrides.rows.map((o) => [o.slot.trim(), o.state]));
 
   res.json({
     day,
@@ -174,10 +173,9 @@ router.get('/:id/day/:day', async (req, res) => {
     players: players.rows,
     slots: SLOTS.map((slot) => ({
       slot,
-      override: when === 'today' ? overrideOf[slot] || null : null,
       state:
         when === 'today'
-          ? slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds, override: overrideOf[slot] }).state
+          ? slotState({ slot, minutes: settings.checkin_minutes, nowSeconds: now.seconds }).state
           : when === 'past' ? 'closed' : 'upcoming',
       attendees: att.rows
         .filter((a) => a.slot.trim() === slot)
@@ -186,7 +184,7 @@ router.get('/:id/day/:day', async (req, res) => {
   });
 });
 
-router.put('/:id/attendance', async (req, res) => {
+router.put('/:id/attendance', requireRecorder, async (req, res) => {
   const { user_id, day, slot, attended } = req.body || {};
   const season = await getSeason(req.params.id);
   if (!season) return res.status(404).json({ error: 'Temporada no encontrada' });
@@ -202,17 +200,47 @@ router.put('/:id/attendance', async (req, res) => {
     if (timing.state === 'upcoming') return res.status(409).json({ error: 'Esa invasión aún no comienza' });
     const user = await db.query(`SELECT 1 FROM users WHERE id = $1 AND status = 'activo'`, [user_id]);
     if (!user.rowCount) return res.status(400).json({ error: 'El jugador no existe o no está activo' });
-    await db.query(
+    const done = await db.query(
       `INSERT INTO invasion_attendance (season_id, user_id, day, slot, source, marked_by)
        VALUES ($1, $2, $3, $4, 'staff', $5) ON CONFLICT DO NOTHING`,
       [season.id, user_id, day, slot, req.user.id]
     );
+    if (done.rowCount) await logAttendance('marcar', season.id, req.user.id, user_id, day, slot);
   } else {
-    await db.query('DELETE FROM invasion_attendance WHERE season_id = $1 AND user_id = $2 AND day = $3 AND slot = $4', [
+    const done = await db.query('DELETE FROM invasion_attendance WHERE season_id = $1 AND user_id = $2 AND day = $3 AND slot = $4', [
       season.id, user_id, day, slot,
     ]);
+    if (done.rowCount) await logAttendance('quitar', season.id, req.user.id, user_id, day, slot);
   }
   res.status(204).end();
+});
+
+// Deja constancia de quién marcó o quitó a quién (solo cuando hubo un cambio real).
+const logAttendance = (action, seasonId, actorId, playerId, day, slot) =>
+  db.query(
+    `INSERT INTO attendance_log (season_id, action, actor_id, actor_name, player_id, player_name, day, slot)
+     SELECT $1, $2, a.id, a.character_name, p.id, p.character_name, $5, $6
+     FROM users a, users p WHERE a.id = $3 AND p.id = $4`,
+    [seasonId, action, actorId, playerId, day, slot]
+  );
+
+// Historial de registros de la temporada y resumen por oficial.
+router.get('/:id/attendance-log', async (req, res) => {
+  if (!(await getSeason(req.params.id))) return res.status(404).json({ error: 'Temporada no encontrada' });
+  const [log, summary] = await Promise.all([
+    db.query(
+      `SELECT id, action, actor_name, player_name, day, slot, created_at FROM attendance_log
+       WHERE season_id = $1 ORDER BY created_at DESC, id DESC LIMIT 300`,
+      [req.params.id]
+    ),
+    db.query(
+      `SELECT actor_name, count(*) FILTER (WHERE action = 'marcar')::int AS marks,
+              count(*) FILTER (WHERE action = 'quitar')::int AS removals, max(created_at) AS last_at
+       FROM attendance_log WHERE season_id = $1 GROUP BY actor_name ORDER BY marks DESC`,
+      [req.params.id]
+    ),
+  ]);
+  res.json({ log: log.rows.map((r) => ({ ...r, slot: r.slot.trim() })), summary: summary.rows });
 });
 
 // Carga o corrige el botín de una invasión (día + horario): las 8 categorías de una vez.

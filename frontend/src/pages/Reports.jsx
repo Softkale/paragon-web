@@ -114,7 +114,6 @@ export default function Reports() {
             {richest && richest.boxes > 0 && <li>Invasión con más cajas: <b>{dayName(richest.day)} {fmtDay(richest.day)} {richest.slot}</b> ({richest.boxes} cajas, {richest.kundum} Kundum).</li>}
             {top && top.total > 0 && <li>Mayor asistencia: <b>{top.name}</b> con {top.total} de {report.opportunities} ({top.pct}%).</li>}
             <li>Jugadores sin ninguna asistencia: <b>{absent}</b> de {T.roster}.</li>
-            <li>Marcas propias: <b>{T.selfMarks}</b> · corregidas por oficiales: <b>{T.staffMarks}</b>{T.attendances ? ` (${Math.round((T.staffMarks / T.attendances) * 100)}%)` : ''}.</li>
             <li>Entregas del reparto: <b>{T.deliveredCount}</b> de {T.toDeliverCount} jugadores con cajas asignadas.</li>
           </ul>
         </Section>

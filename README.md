@@ -1,7 +1,7 @@
 # PARAGON · Guild de Smash MU
 
-Web de la guild: portada pública, control de invasiones (asistencia que marcan los propios miembros, botín y
-reparto de cajas), reportes, gestión de miembros y panel de administración.
+Web de la guild: portada pública, control de invasiones (asistencia anotada por el oficial designado, botín y
+reparto de cajas, también en períodos sin liga), reportes, gestión de miembros y panel de administración.
 
 - **Frontend:** React 17 + Vite
 - **Backend:** Node.js + Express
@@ -29,8 +29,12 @@ Internet ─► nginx (80/443) ─► Node (web compilada + API) ─► PostgreS
 | Rol | Puede |
 |---|---|
 | **Admin** | Todo: usuarios y roles, correo (SMTP), contenido, invasiones, reportes |
-| **Oficial** | Crear/editar miembros, invasiones, botín, reportes de asistencia, contenido de la portada |
-| **Miembro** | Marcar su asistencia, ver el reporte de cajas |
+| **Oficial** | Crear/editar miembros, períodos, botín, reportes, contenido de la portada. **Anotar la asistencia solo si el admin lo designó (puede haber varios oficiales; todo queda en un historial)** (botón «Designar asistencia» en Miembros) |
+| **Miembro** | Ver su reporte: cuántas cajas le tocan y a qué horarios asistió |
+
+La asistencia ya no la marcan los miembros: el oficial designado anota qué PJ asistió a cada horario, incluso de jugadores que aún no
+completan su registro; cuando lo hacen ven su reporte. Las invasiones fuera de la liga se llevan como un período «Sin liga»
+(mismo flujo: asistencia, botín y reparto).
 
 No hay registro público: las cuentas las crean los oficiales/admins (una a una o por carga masiva) y llegan por correo.
 
@@ -72,6 +76,7 @@ se pide cambiarla).
 | `--domain` y `--email` | Dominio y correo para el certificado HTTPS. **Sin dominio** se instala solo por IP, con HTTP |
 | `--admin-name` y `--admin-email` | Primer administrador. Si los omites y hay terminal, los pregunta |
 | `--no-https` | No pedir certificado |
+| `--local-mail` | El sistema **envía sus propios correos** desde este servidor (Postfix + firma DKIM), sin depender de un hosting ni de servicios externos. Ver «Correo propio del sistema». Requiere `--domain` |
 | `--firewall` | **Solo en un servidor nuevo:** activa `ufw` dejando abiertos únicamente SSH, 80 y 443 |
 | `--auto-updates` | **Solo en un servidor nuevo:** activa los parches de seguridad automáticos |
 | `--update` | Hace `git pull` antes de instalar (para actualizar a una versión nueva) |
@@ -386,6 +391,51 @@ su paragon -c "npm run admin:create -- --name TuUsuario --email tucorreo@dominio
 ```
 
 Deja la cuenta como admin **activo** con una clave temporal nueva.
+
+## Correo propio del sistema (sin hosting ni servicios externos)
+
+Con esta opción **PARAGON envía sus propios correos desde el mismo servidor**: instala **Postfix** (solo para enviar,
+no recibe nada de internet) y **OpenDKIM** (firma cada correo). PARAGON se lo entrega a `127.0.0.1:25` y Postfix lo
+entrega directo al destinatario. No usa el SMTP de ningún hosting ni de Gmail, Brevo, etc. El correo que **llega** a
+tus buzones no cambia: sigue yendo a donde apunte el MX de tu dominio.
+
+**Instalarlo** (como root):
+
+```bash
+# junto con la instalación completa:
+bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com --local-mail
+
+# o, si el sistema ya estaba instalado:
+bash /ruta/del/proyecto/deploy/setup-local-mail.sh --domain paragon.tudominio.com
+cd /ruta/del/proyecto/backend && su paragon -c 'node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --user "" --clear-pass --from "PARAGON <no-reply@paragon.tudominio.com>" --app-url https://paragon.tudominio.com'
+```
+
+Al terminar muestra el **registro DKIM** que debes publicar. Pero hay cosas que **solo puedes hacer fuera del servidor**,
+y de ellas depende que los correos lleguen y no caigan en spam:
+
+| Qué | Dónde | Por qué importa |
+|---|---|---|
+| **Registro DKIM** (TXT `paragon._domainkey`) | DNS del dominio (Cloudflare…) | Prueba que el correo lo firmó tu dominio. El valor lo imprime el script |
+| **DNS inverso (PTR)** de la IP → `tudominio.com` | Panel de tu proveedor de VPS | Gmail y Outlook desconfían de IPs cuyo PTR no coincide con el nombre del servidor |
+| **SPF** que incluya la IP del servidor | DNS del dominio | Si tu SPF tiene `+a` y el dominio apunta a este servidor, ya está. Debe haber **un solo** registro SPF |
+| **IP fuera de listas negras (RBL)** | `https://lookup.abusix.com/search?q=TU_IP` | Con la IP listada, muchos destinos rechazan o mandan a spam. Pide el deslistado |
+| **Puerto 25 saliente abierto** | Tu proveedor de VPS | Algunos lo bloquean. Prueba: `timeout 8 bash -c 'echo > /dev/tcp/gmail-smtp-in.l.google.com/25' && echo abierto` |
+
+**Honestidad sobre este método:** enviar correo directo desde un VPS es posible y lo usa mucha gente, pero la entrega
+depende de la **reputación de la IP**, que no controla la aplicación. Una IP nueva o con mala fama puede mandar a spam
+los primeros correos, y volúmenes bajos y constantes (como los de una guild) son los que mejor funcionan. Si pese a
+todo un destino rechaza tus correos, la salida es un servicio de envío externo; se cambia desde el mismo formulario
+(Configuración → Correo) sin tocar nada más.
+
+**Cómo saber qué pasó con cada correo.** El estado «Enviado» del panel significa que **Postfix lo aceptó**; la entrega al
+destinatario ocurre después. Para ver el resultado real:
+
+```bash
+journalctl -t postfix/smtp -f            # en vivo: busca  status=sent  (entregado)  o  status=bounced/deferred
+postqueue -p                             # correos que aún esperan o reintentan
+```
+
+Y en Gmail, abre un correo recibido → ⋮ → *Mostrar original*: deben decir **SPF: PASS** y **DKIM: PASS**.
 
 ## Comprobar que los correos salen
 

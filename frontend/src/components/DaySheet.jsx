@@ -8,9 +8,9 @@ const longDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('es', { week
 const STATE_LABEL = { upcoming: 'Aún no comienza', open: 'Abierta', closed: 'Cerrada' };
 const STATE_CLASS = { upcoming: 'pendiente', open: 'activo', closed: 'inactivo' };
 
-// Asistencia por invasión: el día elegido con sus 3 horarios. Los miembros marcan solos en su ventana;
-// aquí el oficial ve quién marcó y corrige a quien olvidó.
-export default function DaySheet({ sheet, seasonId, day, setDay, onChanged }) {
+// Asistencia por invasión: el día elegido con sus 3 horarios. La anota solo el oficial designado (canRecord);
+// el resto de oficiales la ven en modo lectura. Puede incluir a jugadores que aún no completan su registro.
+export default function DaySheet({ canRecord, sheet, seasonId, day, setDay, onChanged }) {
   const [data, setData] = useState(null);
   const [query, setQuery] = useState('');
   const [view, setView] = useState('all'); // all | in | out
@@ -99,10 +99,10 @@ export default function DaySheet({ sheet, seasonId, day, setDay, onChanged }) {
               <article key={s.slot} className={`card inv-card inv-card--${s.state}`}>
                 <header className="inv-card__head">
                   <b>{s.slot}</b>
-                  <span className={`status status--${STATE_CLASS[s.state]}`}>{STATE_LABEL[s.state]}{s.override ? ' (manual)' : ''}</span>
-                  <span className="inv-card__count"><strong>{s.attendees.length}</strong> asistentes</span>
+                  <span className={`status status--${STATE_CLASS[s.state]}`}>{STATE_LABEL[s.state]}</span>
+                  <span className="inv-card__count"><strong>{s.attendees.length}</strong> PJ</span>
                 </header>
-                {locked && <p className="muted inv-card__note">Podrás registrar asistencia cuando comience la invasión.</p>}
+                {locked && canRecord && <p className="muted inv-card__note">Podrás registrar asistencia cuando comience la invasión.</p>}
                 <ul className="att-list">
                   {rows.map((p) => {
                     const rec = marks[p.id];
@@ -110,11 +110,11 @@ export default function DaySheet({ sheet, seasonId, day, setDay, onChanged }) {
                     return (
                       <li key={p.id}>
                         <label className={`att-row ${rec ? 'is-on' : ''}`}>
-                          <input type="checkbox" checked={!!rec} disabled={(locked && !rec) || busy === k} onChange={(e) => toggle(s.slot, p, e.target.checked)} />
+                          <input type="checkbox" checked={!!rec} disabled={!canRecord || (locked && !rec) || busy === k} onChange={(e) => toggle(s.slot, p, e.target.checked)} />
                           <span className="att-row__name">{p.name}</span>
                           {rec && (
-                            <span className={`att-badge att-badge--${rec.source}`} title={rec.source === 'self' ? 'Marcó el propio jugador' : `Marcado por ${rec.marked_by}`}>
-                              {rec.source === 'self' ? `marcó ${time(rec.marked_at)}` : `${rec.marked_by || 'oficial'} ${time(rec.marked_at)}`}
+                            <span className="att-badge att-badge--staff" title={`Anotado por ${rec.marked_by || 'un oficial'}`}>
+                              {rec.marked_by || 'oficial'} {time(rec.marked_at)}
                             </span>
                           )}
                         </label>
@@ -129,8 +129,9 @@ export default function DaySheet({ sheet, seasonId, day, setDay, onChanged }) {
         </div>
       )}
       <p className="muted" style={{ marginTop: 10 }}>
-        Los miembros marcan solos durante los {data ? data.minutes : 30} minutos de cada invasión. Si alguien olvidó marcar, márcalo aquí:
-        queda registrado con tu nombre (insignia dorada) para distinguirlo de las marcas propias.
+        {canRecord
+          ? 'Marca los PJ que asistieron a cada horario. Cuentan aunque todavía no hayan completado su registro; cuando lo hagan verán su reporte.'
+          : 'Solo el oficial designado por el administrador puede anotar la asistencia. Tú puedes consultarla.'}
       </p>
     </>
   );

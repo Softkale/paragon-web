@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!getToken()) return;
     api.get('/auth/me')
-      .then((me) => setUser({ id: me.id, name: me.character_name, role: me.role, mustChange: me.must_change_password }))
+      .then((me) => setUser({ id: me.id, name: me.character_name, role: me.role, mustChange: me.must_change_password, canRecord: me.role === 'admin' || (me.role === 'oficial' && !!me.records_attendance) }))
       .catch(() => setToken(null))
       .finally(() => setLoading(false));
   }, []);

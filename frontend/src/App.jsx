@@ -10,7 +10,6 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 import CheckIn from './pages/CheckIn';
 import LootReport from './pages/LootReport';
-import InvasionPrompt from './components/InvasionPrompt';
 
 export default function App() {
   const { pathname } = useLocation();
@@ -18,7 +17,6 @@ export default function App() {
 
   return (
     <>
-      <InvasionPrompt />
       {!isAdmin && <Embers />}
       {!isAdmin && <Navbar />}
       <Switch>

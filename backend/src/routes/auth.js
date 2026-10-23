@@ -20,6 +20,7 @@ const sign = (u) =>
 
 const publicUser = (u) => ({
   id: u.id, name: u.character_name, role: u.role, mustChange: u.must_change_password, timezone: u.timezone || null,
+  canRecord: u.role === 'admin' || (u.role === 'oficial' && !!u.records_attendance),
 });
 
 // Fuerza bruta: tras 8 fallos con el mismo usuario desde la misma IP se bloquea 15 minutos.
@@ -49,7 +50,7 @@ router.post('/login', async (req, res) => {
 
 router.get('/me', requireSession, async (req, res) => {
   const { rows } = await db.query(
-    'SELECT id, character_name, email, character_class, role, status, must_change_password, timezone FROM users WHERE id = $1',
+    'SELECT id, character_name, email, character_class, role, status, must_change_password, timezone, records_attendance FROM users WHERE id = $1',
     [req.user.id]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Usuario no encontrado' });

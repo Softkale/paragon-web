@@ -21,13 +21,13 @@ async function authenticate(req, res) {
     return false;
   }
 
-  const { rows } = await db.query('SELECT role, status, must_change_password FROM users WHERE id = $1', [payload.id]);
+  const { rows } = await db.query('SELECT role, status, must_change_password, records_attendance FROM users WHERE id = $1', [payload.id]);
   const user = rows[0];
   if (!user || user.status !== 'activo') {
     res.status(401).json({ error: 'Tu cuenta no está activa' });
     return false;
   }
-  req.user = { ...payload, role: user.role, mcp: user.must_change_password };
+  req.user = { ...payload, role: user.role, mcp: user.must_change_password, recorder: user.role === 'admin' || (user.role === 'oficial' && user.records_attendance) };
   return true;
 }
 
@@ -55,4 +55,12 @@ function requireRole(minRole) {
   };
 }
 
-module.exports = { requireAuth, requireSession, requireRole, LEVEL };
+// Solo el admin y el oficial designado anotan la asistencia a las invasiones.
+function requireRecorder(req, res, next) {
+  if (!req.user.recorder) {
+    return res.status(403).json({ error: 'Solo el oficial designado para la asistencia puede registrarla' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireSession, requireRole, requireRecorder, LEVEL };
