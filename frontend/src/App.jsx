@@ -10,6 +10,9 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 import CheckIn from './pages/CheckIn';
 import LootReport from './pages/LootReport';
+import Clanes from './pages/Clanes';
+import ClanDetail from './pages/ClanDetail';
+import Personaje from './pages/Personaje';
 
 export default function App() {
   const { pathname } = useLocation();
@@ -27,6 +30,9 @@ export default function App() {
         <Route path="/restablecer" component={ResetPassword} />
         <Route path="/invasiones" component={CheckIn} />
         <Route path="/cajas" component={LootReport} />
+        <Route exact path="/clanes" component={Clanes} />
+        <Route path="/clanes/:name" component={ClanDetail} />
+        <Route path="/personaje/:name?" component={Personaje} />
       </Switch>
       {!isAdmin && <Footer />}
     </>

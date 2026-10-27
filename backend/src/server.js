@@ -67,6 +67,7 @@ app.use('/api/news', content.news);
 app.use('/api/legends', content.legends);
 app.use('/api/site', require('./routes/site'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/ranking', require('./routes/ranking'));
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 
 // Sirve la web ya compilada (frontend/dist) desde este mismo servidor, con la ruta de respaldo de la SPA.

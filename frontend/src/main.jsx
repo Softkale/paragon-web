@@ -7,6 +7,7 @@ import { SiteProvider } from './SiteContext';
 import './styles/global.css';
 import './styles/home.css';
 import './styles/admin.css';
+import './styles/ranking.css';
 
 ReactDOM.render(
   <React.StrictMode>

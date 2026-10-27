@@ -509,6 +509,21 @@ El `.env` se genera solo; estas son las variables que puede contener:
 | `FRONTEND_DIST` | Ruta de la web compilada, si no está en `../frontend/dist` |
 | `CORS_ORIGIN` | Solo si sirves la web desde otro dominio |
 | `APP_URL`, `SMTP_*` | Opcionales: se configuran desde el panel; aquí solo si quieres dejarlos fijos |
+| `GUILD_NAME` | Nombre exacto del clan en el juego que se destaca en `/clanes` (por defecto `Paragon`) |
+| `SMASH_API_BASE` | Origen de los datos de rankings (por defecto `https://www.smashmu.com`) |
+
+## Clanes y rankings (`/clanes`)
+
+La web consulta los datos públicos de Smash MU desde el servidor (el navegador nunca habla con smashmu.com) y los guarda en
+memoria 5–15 minutos; si el origen cae, sigue mostrando el último dato bueno. Pestañas: **Nuestro clan** (integrantes de
+`GUILD_NAME`), **Todos los clanes**, **Nivel** (top 100) y **Gear Score** (todos los personajes, con búsqueda). Cada clan
+tiene su ficha en `/clanes/NombreDelClan`. La pestaña **Buscar personaje** (y cualquier nick de las tablas) abre
+`/personaje/Nick` con su equipamiento: ítems con +nivel, rareza, opciones excellent, harmony, sockets y más; las imágenes de
+los ítems las sirve nuestro propio servidor. Al arrancar se precarga el clan propio; la primera consulta de otro clan puede
+tardar unos segundos.
+
+API (solo lectura, sin sesión): `GET /api/ranking/level`, `/gearscore?page&pageSize&q`, `/guilds?q`, `/guilds/:name` y
+`/own-guild`, `/character/:name` y `/item/:file`. El Master Level solo lo publica el origen para el top 100 de nivel; para el resto aparece «—».
 
 ## Seguridad que ya incluye
 

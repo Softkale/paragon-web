@@ -1,0 +1,85 @@
+/* ---------- Clanes y rankings ---------- */
+.rk { padding-top: 130px; min-height: 100vh; }
+.rk .section__title { margin-bottom: 32px; }
+.rk .tabs { justify-content: center; margin-bottom: 28px; }
+.rk-back { margin-bottom: 20px; }
+
+.rk-tools { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.rk-tools .search { width: min(100%, 360px); }
+.rk-dim { color: var(--muted); }
+.rk-note { margin-top: 14px; color: var(--muted); font-size: .82rem; }
+.rk-state { text-align: center; color: var(--muted); display: grid; gap: 14px; justify-items: center; }
+.rk-empty { text-align: center; color: var(--muted); padding: 28px 18px; }
+
+.rk-table { min-width: 720px; }
+.rk-table td { white-space: nowrap; }
+.rk-table th.num, .rk-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.rk-table .rk-rank { width: 56px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rk-table .rk-gs { color: var(--gold); font-weight: 600; }
+.rk-table tr.is-own td { background: rgba(255, 122, 26, .08); }
+.rk-table tr.is-own td:first-child { box-shadow: inset 3px 0 0 var(--fire); }
+.rk-crown { color: var(--gold); }
+.rk-guild { display: inline-flex; align-items: center; vertical-align: middle; gap: 8px; color: var(--gold); font-weight: 600; }
+.rk-guild:hover { color: var(--fire); }
+
+.rk-sort { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; white-space: nowrap; }
+.rk-sort:hover, .rk-sort.is-on { color: var(--gold); }
+
+.rk-pager { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; color: var(--muted); font-size: .9rem; }
+.rk-pager .btn:disabled { opacity: .4; cursor: default; transform: none; }
+
+/* Escudo de clan 8x8 */
+.gmark { display: inline-grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); flex: none; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; background: rgba(0, 0, 0, .35); }
+.gmark i { display: block; }
+
+/* Ficha del clan */
+.clan { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-bottom: 22px; }
+.clan__title { flex: 1 1 200px; min-width: 0; }
+.clan__title h2 { font-family: var(--serif); font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: .06em; color: var(--gold); overflow-wrap: anywhere; }
+.clan__title p { color: var(--muted); }
+.clan__title b { color: var(--text); }
+.clan__stats { display: flex; gap: 28px; flex-wrap: wrap; }
+.clan__stats dt { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+.clan__stats dd { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 720px) {
+  .rk { padding-top: 110px; }
+  .clan { gap: 16px; }
+  .clan__stats { gap: 20px; width: 100%; }
+}
+
+/* Buscador de personajes */
+.csearch { max-width: 720px; margin: 0 auto 28px; }
+.csearch__form { display: flex; gap: 12px; flex-wrap: wrap; }
+.csearch__form .search { flex: 1 1 240px; min-width: 0; }
+.csearch__form .btn:disabled { opacity: .5; cursor: default; transform: none; }
+.csearch__list { list-style: none; margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.csearch__list li + li { border-top: 1px solid rgba(49, 57, 71, .5); }
+.csearch__list a { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr auto; gap: 12px; align-items: center; padding: 11px 16px; font-size: .92rem; }
+.csearch__list a:hover { background: rgba(244, 198, 109, .07); }
+.csearch__list .rk-gs { color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; }
+.csearch__none { padding: 14px 16px; color: var(--muted); font-size: .9rem; }
+.rk-nick:hover { color: var(--gold); }
+
+/* Equipamiento */
+.eq { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.eq__item { display: flex; gap: 14px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(160deg, var(--panel), var(--bg2)); --rar: var(--muted); }
+.eq__item--empty { opacity: .45; align-items: center; }
+.eq__img { flex: none; width: 64px; height: 64px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 10px; background: rgba(0, 0, 0, .35); }
+.eq__img img { max-width: 56px; max-height: 56px; object-fit: contain; }
+.eq__body { min-width: 0; }
+.eq small { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+.eq__name { font-weight: 600; color: var(--rar); overflow-wrap: anywhere; }
+.eq__name b { color: var(--gold); }
+.eq__tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+.eq__tags .tag { font-size: .65rem; padding: 1px 8px; }
+.eq__exc { list-style: none; font-size: .82rem; color: var(--green); }
+.eq--common { --rar: #d7dae2; }
+.eq--rare { --rar: #5aa9ff; border-color: rgba(90, 169, 255, .35); }
+.eq--epic { --rar: #b78cff; border-color: rgba(183, 140, 255, .4); }
+.eq--legendary { --rar: #ffb347; border-color: rgba(255, 179, 71, .45); box-shadow: 0 0 18px rgba(255, 122, 26, .12); }
+
+@media (max-width: 720px) {
+  .csearch__list a { grid-template-columns: 1fr auto; }
+  .csearch__list a span:nth-of-type(1), .csearch__list a .rk-dim { display: none; }
+}
