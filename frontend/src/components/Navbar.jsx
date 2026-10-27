@@ -6,7 +6,7 @@ import { useSite } from '../SiteContext';
 const links = [
   ['#inicio', 'Inicio'],
   ['#eventos', 'Eventos'],
-  ['#ranking', 'Ranking'],
+  ['/clanes?tab=nivel', 'Ranking'],
   ['#noticias', 'Noticias'],
   ['#unete', 'Únete'],
 ];
@@ -31,11 +31,15 @@ export default function Navbar() {
         <span>PARAGON</span>
       </Link>
       <nav className={`nav__links ${open ? 'is-open' : ''}`}>
-        {links.filter(([href]) => href !== '#unete' || site.cta_url).map(([href, label]) => (
+        {links.filter(([href]) => href !== '#unete' || site.cta_url).map(([href, label]) => (href.startsWith('#') ? (
           <a key={href} href={`/${href}`} onClick={() => setOpen(false)}>
             {label}
           </a>
-        ))}
+        ) : (
+          <Link key={href} to={href} onClick={() => setOpen(false)}>
+            {label}
+          </Link>
+        )))}
         <Link to="/clanes" onClick={() => setOpen(false)}>Clanes</Link>
         {user ? (
           <NavLink to={user.role === 'miembro' ? '/invasiones' : '/admin'} className="btn btn--sm" onClick={() => setOpen(false)}>
