@@ -132,7 +132,15 @@ PKGS=(curl git ca-certificates gnupg nginx postgresql postgresql-client cron)
 command -v certbot >/dev/null 2>&1 || PKGS+=(certbot python3-certbot-nginx)
 [ "$FIREWALL" -eq 1 ] && PKGS+=(ufw)
 [ "$AUTO_UPDATES" -eq 1 ] && PKGS+=(unattended-upgrades)
-run apt-get install -y --no-upgrade "${PKGS[@]}"
+# Solo se llama a apt si falta algo: así una actualización no se detiene por un problema ajeno de dpkg
+# (por ejemplo un paquete del sistema a medio configurar) cuando ya está todo instalado.
+MISSING=()
+for p in "${PKGS[@]}"; do dpkg -s "$p" >/dev/null 2>&1 || MISSING+=("$p"); done
+if [ "${#MISSING[@]}" -gt 0 ]; then
+  run apt-get install -y --no-upgrade "${MISSING[@]}"
+else
+  info "Ya estaban todos instalados"
+fi
 run systemctl enable --now postgresql
 run systemctl enable --now nginx
 info "Paquetes listos"
