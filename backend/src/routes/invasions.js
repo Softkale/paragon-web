@@ -1,7 +1,8 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { allocate } = require('../lib/allocation');
+const { allocate, raffleOf } = require('../lib/allocation');
+const { groupDraws } = require('../lib/raffle');
 const { seasonEnd } = require('../lib/dates');
 const { SLOTS, LOOT_NAMES, getSettings, nowIn } = require('../lib/schedule');
 
@@ -15,12 +16,14 @@ const sum = (arr) => arr.reduce((a, b) => a + b, 0);
 // ya puede haber datos de la persona desde antes de que completara su registro.
 router.get('/mine', async (req, res) => {
   const me = req.user.id;
-  const [seasons, att, loot, delivered] = await Promise.all([
+  const [seasons, att, loot, delivered, raffle] = await Promise.all([
     db.query('SELECT * FROM seasons ORDER BY start_date DESC'),
     db.query('SELECT season_id, user_id, day, slot FROM invasion_attendance'),
     db.query('SELECT season_id, category, quantity FROM season_loot'),
     db.query('SELECT season_id FROM season_delivery WHERE user_id = $1', [me]),
+    db.query('SELECT season_id, category, user_id, pos, pool_key FROM season_raffle'),
   ]);
+  const draws = groupDraws(raffle.rows);
   const { day: today } = nowIn((await getSettings()).timezone);
   const deliveredSet = new Set(delivered.rows.map((d) => d.season_id));
 
@@ -33,7 +36,15 @@ router.get('/mine', async (req, res) => {
 
     const inventory = Array(LOOT_NAMES.length).fill(0);
     loot.rows.filter((l) => l.season_id === s.id).forEach((l) => { inventory[l.category] += l.quantity; });
-    const boxes = inventory.map((n) => allocate(n, roster)[me] || 0);
+    const boxes = inventory.map((n, c) => allocate(n, roster, draws[s.id]?.[c])[me] || 0);
+    // Sorteos de cajas sobrantes en los que participa el usuario (pendiente, ganado o no salió).
+    const raffles = inventory
+      .map((n, c) => ({ category: c, name: LOOT_NAMES[c], r: raffleOf(n, roster, draws[s.id]?.[c]) }))
+      .filter((x) => x.r && x.r.candidates.includes(me))
+      .map(({ category, name, r }) => ({
+        category, name, slots: r.slots, participants: r.candidates.length,
+        status: !r.winners ? 'pending' : r.winners.includes(me) ? 'won' : 'lost',
+      }));
 
     const mine = rows.filter((a) => a.user_id === me);
     const bySlot = Object.fromEntries(SLOTS.map((slot) => [slot, 0]));
@@ -45,7 +56,7 @@ router.get('/mine', async (req, res) => {
       current: s.start_date <= today && today <= end,
       attendances: mine.length, opportunities, bySlot,
       attended: mine.map((a) => ({ day: a.day, slot: a.slot.trim() })).sort((a, b) => b.day.localeCompare(a.day) || b.slot.localeCompare(a.slot)),
-      boxes, totalBoxes: sum(boxes), delivered: deliveredSet.has(s.id),
+      boxes, raffles, totalBoxes: sum(boxes), delivered: deliveredSet.has(s.id),
     };
   });
 

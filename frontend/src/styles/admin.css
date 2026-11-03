@@ -99,6 +99,32 @@
 .loot-chip strong { font-family: var(--serif); font-size: 1.6rem; color: var(--gold); }
 .plain-btn { background: none; border: 0; cursor: pointer; font-size: .9rem; }
 
+/* Sorteo de cajas sobrantes */
+.raffle-list { display: grid; gap: 12px; margin: 14px 0; }
+.raffle { padding: 16px; border-color: var(--gold2); border-style: dashed; }
+.raffle--done { border-style: solid; border-color: var(--border); }
+.raffle__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.raffle__head strong { color: var(--gold); }
+.raffle__people { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.raffle__person { padding: 3px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: .85rem; }
+.raffle__person--pending { border-color: var(--gold2); }
+.raffle__person--won { background: rgba(115, 211, 161, .15); border-color: var(--green); color: var(--green); font-weight: 600; }
+.raffle__person--lost { color: var(--muted); }
+.raffle__undo { margin-top: 12px; }
+.raffle-mark { cursor: help; }
+.raffle-note { margin-top: 8px; font-size: .85rem; color: var(--gold); }
+.raffle-note--won { color: var(--green); }
+.raffle-note--lost { color: var(--muted); }
+
+.raffle-modal { max-width: 440px; text-align: center; }
+.wheel { position: relative; width: min(300px, 80vw); aspect-ratio: 1; margin: 0 auto; }
+.wheel__svg { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 4px var(--gold2), 0 0 40px rgba(255, 122, 26, .3); }
+.wheel__pointer { position: absolute; top: -8px; left: 50%; z-index: 2; width: 0; height: 0; transform: translateX(-50%); border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 22px solid var(--fire); filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.raffle-winners { list-style: none; margin-top: 16px; display: grid; gap: 6px; }
+.raffle-winners li { padding: 8px 12px; border-radius: 10px; background: rgba(115, 211, 161, .12); border: 1px solid var(--green); }
+.raffle-winners span { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; margin-right: 6px; }
+.raffle-winners b { color: var(--green); }
+
 /* ---------- Control de marcación (panel) ---------- */
 .control-sub { margin: 22px 0 10px; font-family: var(--serif); color: var(--gold); }
 .control-slots { display: grid; gap: 10px; }

@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { allocate } = require('../lib/allocation');
+const { groupDraws } = require('../lib/raffle');
 const { seasonEnd, seasonDays } = require('../lib/dates');
 const { SLOTS, LOOT_NAMES, KUNDUM_COUNT } = require('../lib/schedule');
 
@@ -52,7 +53,7 @@ async function seasonReport(id) {
   if (!season) return null;
   season.end_date = seasonEnd(season.start_date, season.weeks);
 
-  const [players, att, loot, delivered] = await Promise.all([
+  const [players, att, loot, delivered, raffle] = await Promise.all([
     db.query(
       `SELECT id, character_name AS name FROM users
        WHERE status = 'activo' OR id IN (SELECT user_id FROM invasion_attendance WHERE season_id = $1)
@@ -62,7 +63,9 @@ async function seasonReport(id) {
     db.query('SELECT user_id, day, slot, source FROM invasion_attendance WHERE season_id = $1', [season.id]),
     db.query('SELECT day, slot, category, quantity FROM season_loot WHERE season_id = $1', [season.id]),
     db.query('SELECT user_id FROM season_delivery WHERE season_id = $1', [season.id]),
+    db.query('SELECT season_id, category, user_id, pos, pool_key FROM season_raffle WHERE season_id = $1', [season.id]),
   ]);
+  const draws = groupDraws(raffle.rows)[season.id] || {};
 
   const days = seasonDays(season.start_date, season.weeks);
   const opportunities = SLOTS.length * days.length;
@@ -130,7 +133,7 @@ async function seasonReport(id) {
 
   // Reparto por jugador (mismo cálculo que la planilla) y entregas.
   const roster = players.rows.map((p) => ({ ...p, count: perPlayer[p.id]?.total || 0 }));
-  const shares = inventory.map((n) => allocate(n, roster));
+  const shares = inventory.map((n, c) => allocate(n, roster, draws[c]));
   const deliveredSet = new Set(delivered.rows.map((d) => d.user_id));
   const playerRows = roster.map((p) => ({
     id: p.id, name: p.name, total: p.count, pct: round((p.count / opportunities) * 100, 1),

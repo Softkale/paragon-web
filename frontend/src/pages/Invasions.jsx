@@ -3,6 +3,7 @@ import { api } from '../api';
 import LootEntry from '../components/LootEntry';
 import DaySheet from '../components/DaySheet';
 import AttendanceLog from '../components/AttendanceLog';
+import RaffleWheel from '../components/RaffleWheel';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (s, n) => {
@@ -67,6 +68,7 @@ export default function Invasions({ me }) {
   const [sheet, setSheet] = useState(null);
   const [day, setDay] = useState(null);
   const [form, setForm] = useState(null); // null | 'new' | 'edit'
+  const [wheel, setWheel] = useState(null); // sorteo abierto en la ruleta
   const [error, setError] = useState('');
   const loadSeasons = useCallback(async (selectId) => {
     const list = await api.get('/seasons');
@@ -96,6 +98,15 @@ export default function Invasions({ me }) {
 
   const delivered = useMemo(() => new Set(sheet ? sheet.delivered : []), [sheet]);
 
+  const playerById = useMemo(() => Object.fromEntries((sheet ? sheet.players : []).map((p) => [p.id, p])), [sheet]);
+  const nameOf = useCallback((id) => playerById[id]?.name || `#${id}`, [playerById]);
+  // Por categoría, los jugadores que participan en un sorteo (para marcarlos en la tabla).
+  const raffleSeats = useMemo(() => {
+    const seats = {};
+    (sheet ? sheet.raffles : []).forEach((r) => { seats[r.category] = new Set(r.candidates); });
+    return seats;
+  }, [sheet]);
+
   const run = async (fn) => {
     try { await fn(); } catch (err) { window.alert(err.message); }
   };
@@ -115,6 +126,12 @@ export default function Invasions({ me }) {
     const list = await api.get('/seasons');
     setSeasons(list);
     setSelected(list.length ? pickCurrent(list).id : null);
+  });
+
+  const undoRaffle = (raffle) => run(async () => {
+    if (!window.confirm(`¿Anular el sorteo de ${raffle.name}? Se podrá volver a sortear.`)) return;
+    await api.del(`/seasons/${selected}/raffle/${raffle.category}`);
+    await loadSheet(selected);
   });
 
   const setDelivery = (player, value) => run(async () => {
@@ -183,9 +200,54 @@ export default function Invasions({ me }) {
             ))}
           </div>
 
+          {sheet.raffles.length > 0 && (
+            <>
+              <h3 className="admin-h" style={{ marginTop: 32 }}>
+                🎲 Cajas por sortear
+                <small className="muted"> · sobran cajas entre jugadores con la misma asistencia; no se asignan por nombre</small>
+              </h3>
+              <div className="raffle-list">
+                {sheet.raffles.map((r) => (
+                  <article key={r.category} className={`card raffle${r.winners ? ' raffle--done' : ''}`}>
+                    <header className="raffle__head">
+                      <div>
+                        <strong>{r.slots} {r.slots === 1 ? 'caja' : 'cajas'} · {r.name}</strong>
+                        <span className="muted"> entre {r.candidates.length} jugadores con {playerById[r.candidates[0]]?.count} asistencias</span>
+                      </div>
+                      {r.winners
+                        ? <span className="tag">Sorteado</span>
+                        : <button className="btn btn--sm" onClick={() => setWheel(r)}>🎰 Girar ruleta</button>}
+                    </header>
+                    <ul className="raffle__people">
+                      {r.candidates.map((id) => {
+                        const state = !r.winners ? 'pending' : r.winners.includes(id) ? 'won' : 'lost';
+                        return (
+                          <li key={id} className={`raffle__person raffle__person--${state}`}>
+                            {nameOf(id)}{state === 'won' && ' ★'}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {r.winners && me.role === 'admin' && (
+                      <button className="icon-btn raffle__undo" onClick={() => undoRaffle(r)}>Anular sorteo</button>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
+          {wheel && (
+            <RaffleWheel
+              seasonId={current.id}
+              raffle={wheel}
+              nameOf={nameOf}
+              onClose={(changed) => { setWheel(null); if (changed) loadSheet(selected); }}
+            />
+          )}
+
           <h3 className="admin-h" style={{ marginTop: 32 }}>
             Reparto de cajas
-            <small className="muted"> · proporcional a las asistencias; la casilla confirma la entrega</small>
+            <small className="muted"> · proporcional a las asistencias; 🎲 = participa en un sorteo; la casilla confirma la entrega</small>
           </h3>
           <div className="card table-wrap">
             <table className="table">
@@ -199,7 +261,12 @@ export default function Invasions({ me }) {
                     <tr key={p.id}>
                       <td><b>{p.name}</b></td>
                       <td>{p.count}</td>
-                      {row.map((n, i) => <td key={i} className="reward">{n}</td>)}
+                      {row.map((n, i) => (
+                        <td key={i} className="reward">
+                          {n}
+                          {raffleSeats[i]?.has(p.id) && <span className="raffle-mark" title="Participa en el sorteo de las cajas sobrantes de esta categoría"> 🎲</span>}
+                        </td>
+                      ))}
                       <td><b>{row.reduce((a, b) => a + b, 0)}</b></td>
                       <td><input type="checkbox" checked={delivered.has(p.id)} onChange={(e) => setDelivery(p, e.target.checked)} /></td>
                     </tr>

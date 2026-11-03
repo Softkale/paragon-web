@@ -168,6 +168,20 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS records_attendance BOOLEAN NOT NULL D
 -- (asistencia, botín y reparto de cajas), pero se identifica aparte.
 ALTER TABLE seasons ADD COLUMN IF NOT EXISTS kind VARCHAR(5) NOT NULL DEFAULT 'liga' CHECK (kind IN ('liga', 'libre'));
 
+-- ---------- Sorteo de cajas sobrantes ----------
+-- Cuando las cajas de una categoría no se dividen exacto entre jugadores con la misma asistencia, las que sobran se sortean.
+-- pool_key identifica al grupo sorteado (cupos + participantes): si la asistencia cambia y el grupo ya no es el mismo, el sorteo deja de valer.
+CREATE TABLE IF NOT EXISTS season_raffle (
+  season_id INT NOT NULL REFERENCES seasons(id) ON DELETE CASCADE,
+  category  SMALLINT NOT NULL CHECK (category BETWEEN 0 AND 7),
+  user_id   INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  pos       SMALLINT NOT NULL,
+  pool_key  TEXT NOT NULL,
+  drawn_by  INT REFERENCES users(id) ON DELETE SET NULL,
+  drawn_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (season_id, category, user_id)
+);
+
 -- ---------- Historial de la asistencia ----------
 -- Cada marca o retiro hecho por un oficial. Los nombres se copian para que el rastro sobreviva si se borra un usuario.
 CREATE TABLE IF NOT EXISTS attendance_log (

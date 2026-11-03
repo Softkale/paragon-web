@@ -68,6 +68,14 @@ export default function CheckIn() {
               ))}
               <div className="card loot-chip"><span>Total</span><strong>{season.totalBoxes}</strong></div>
             </div>
+            {season.raffles.map((r) => (
+              <p key={r.category} className={`raffle-note raffle-note--${r.status}`}>
+                🎲 {r.name}: {r.slots} {r.slots === 1 ? 'caja' : 'cajas'} a sorteo entre {r.participants} jugadores con tu misma asistencia
+                {r.status === 'pending' && ' — aún sin sortear.'}
+                {r.status === 'won' && ' — ¡saliste ganador! Ya está sumada a tus cajas.'}
+                {r.status === 'lost' && ' — esta vez no salió tu nombre.'}
+              </p>
+            ))}
             {season.totalBoxes > 0 && (
               <p className="muted" style={{ marginTop: 8 }}>{season.delivered ? '✓ Tu reparto ya fue entregado.' : 'Tu reparto aún no ha sido entregado.'}</p>
             )}
