@@ -4,6 +4,7 @@ import LootEntry from '../components/LootEntry';
 import DaySheet from '../components/DaySheet';
 import AttendanceLog from '../components/AttendanceLog';
 import RaffleWheel from '../components/RaffleWheel';
+import { DISTRIBUTIONS, blockLabel } from '../components/blocks';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (s, n) => {
@@ -42,6 +43,13 @@ function SeasonForm({ initial, onSave, onCancel, title }) {
           <option value="libre">Sin liga (las invasiones continúan)</option>
         </select>
       </label>
+      <label className="field">
+        <span>Reparto de cajas</span>
+        <select className="select" value={form.distribution} onChange={set('distribution')}>
+          {Object.entries(DISTRIBUTIONS).map(([k, d]) => <option key={k} value={k}>{d.name}</option>)}
+        </select>
+        <small className="muted">{DISTRIBUTIONS[form.distribution].hint}</small>
+      </label>
       <label className="field"><span>Nombre</span><input value={form.name} onChange={set('name')} required /></label>
       <label className="field"><span>Inicio</span><input type="date" value={form.start_date} onChange={set('start_date')} required /></label>
       <label className="field">
@@ -69,6 +77,7 @@ export default function Invasions({ me }) {
   const [day, setDay] = useState(null);
   const [form, setForm] = useState(null); // null | 'new' | 'edit'
   const [wheel, setWheel] = useState(null); // sorteo abierto en la ruleta
+  const [view, setView] = useState('total'); // 'total' o la clave de un bloque de reparto (día o semana)
   const [error, setError] = useState('');
   const loadSeasons = useCallback(async (selectId) => {
     const list = await api.get('/seasons');
@@ -87,7 +96,7 @@ export default function Invasions({ me }) {
   }, []);
 
   useEffect(() => { loadSeasons().catch((e) => setError(e.message)); }, [loadSeasons]);
-  useEffect(() => { setDay(null); loadSheet(selected); }, [selected, loadSheet]);
+  useEffect(() => { setDay(null); setView('total'); loadSheet(selected); }, [selected, loadSheet]);
 
   // Día inicial: hoy si está en la temporada; si no, el último día ya transcurrido o el primero.
   useEffect(() => {
@@ -100,12 +109,25 @@ export default function Invasions({ me }) {
 
   const playerById = useMemo(() => Object.fromEntries((sheet ? sheet.players : []).map((p) => [p.id, p])), [sheet]);
   const nameOf = useCallback((id) => playerById[id]?.name || `#${id}`, [playerById]);
-  // Por categoría, los jugadores que participan en un sorteo (para marcarlos en la tabla).
+  // Bloques de reparto (todo el período, cada semana o cada día) con su nombre legible.
+  const blocks = useMemo(() => {
+    if (!sheet) return [];
+    return sheet.blocks.map((b, i) => ({
+      ...b,
+      label: blockLabel(sheet.distribution, b.key, b.days?.[0], b.days?.[b.days.length - 1], i + 1),
+    }));
+  }, [sheet]);
+  const blockByKey = useMemo(() => Object.fromEntries(blocks.map((b) => [b.key, b])), [blocks]);
+  const activeBlock = view === 'total' ? null : blockByKey[view] || null;
+
+  // Por categoría, los jugadores que participan en un sorteo del bloque que se está viendo (para marcarlos en la tabla).
   const raffleSeats = useMemo(() => {
     const seats = {};
-    (sheet ? sheet.raffles : []).forEach((r) => { seats[r.category] = new Set(r.candidates); });
+    (sheet ? sheet.raffles : [])
+      .filter((r) => !activeBlock || r.bucket === activeBlock.key)
+      .forEach((r) => { (seats[r.category] ||= new Set()); r.candidates.forEach((id) => seats[r.category].add(id)); });
     return seats;
-  }, [sheet]);
+  }, [sheet, activeBlock]);
 
   const run = async (fn) => {
     try { await fn(); } catch (err) { window.alert(err.message); }
@@ -130,7 +152,7 @@ export default function Invasions({ me }) {
 
   const undoRaffle = (raffle) => run(async () => {
     if (!window.confirm(`¿Anular el sorteo de ${raffle.name}? Se podrá volver a sortear.`)) return;
-    await api.del(`/seasons/${selected}/raffle/${raffle.category}`);
+    await api.del(`/seasons/${selected}/raffle/${raffle.category}?bucket=${encodeURIComponent(raffle.bucket)}`);
     await loadSheet(selected);
   });
 
@@ -144,6 +166,7 @@ export default function Invasions({ me }) {
   const last = seasons[0]; // la lista llega ordenada por inicio descendente
   const newDefaults = {
     kind: 'liga',
+    distribution: 'periodo',
     name: `Temporada ${seasons.length + 1}`,
     start_date: last ? addDays(last.end_date, 1) : today(),
     weeks: 2,
@@ -174,7 +197,7 @@ export default function Invasions({ me }) {
       {form === 'edit' && current && (
         <SeasonForm
           title="Editar temporada"
-          initial={{ name: current.name, kind: current.kind, start_date: current.start_date, weeks: String(current.weeks) }}
+          initial={{ name: current.name, kind: current.kind, distribution: current.distribution, start_date: current.start_date, weeks: String(current.weeks) }}
           onSave={saveSeason}
           onCancel={() => setForm(null)}
         />
@@ -204,15 +227,16 @@ export default function Invasions({ me }) {
             <>
               <h3 className="admin-h" style={{ marginTop: 32 }}>
                 🎲 Cajas por sortear
-                <small className="muted"> · sobran cajas entre jugadores con la misma asistencia; no se asignan por nombre</small>
+                <small className="muted"> · sobran cajas entre jugadores con la misma asistencia; se definen por sorteo</small>
               </h3>
               <div className="raffle-list">
                 {sheet.raffles.map((r) => (
-                  <article key={r.category} className={`card raffle${r.winners ? ' raffle--done' : ''}`}>
+                  <article key={`${r.bucket}|${r.category}`} className={`card raffle${r.winners ? ' raffle--done' : ''}`}>
                     <header className="raffle__head">
                       <div>
                         <strong>{r.slots} {r.slots === 1 ? 'caja' : 'cajas'} · {r.name}</strong>
-                        <span className="muted"> entre {r.candidates.length} jugadores con {playerById[r.candidates[0]]?.count} asistencias</span>
+                        {sheet.distribution !== 'periodo' && <span className="tag" style={{ marginLeft: 8 }}>{blockByKey[r.bucket]?.label}</span>}
+                        <span className="muted"> entre {r.candidates.length} jugadores con {blockByKey[r.bucket]?.counts[r.candidates[0]]} asistencias</span>
                       </div>
                       {r.winners
                         ? <span className="tag">Sorteado</span>
@@ -240,27 +264,41 @@ export default function Invasions({ me }) {
             <RaffleWheel
               seasonId={current.id}
               raffle={wheel}
+              blockLabel={sheet.distribution !== 'periodo' ? blockByKey[wheel.bucket]?.label : ''}
               nameOf={nameOf}
               onClose={(changed) => { setWheel(null); if (changed) loadSheet(selected); }}
             />
           )}
 
           <h3 className="admin-h" style={{ marginTop: 32 }}>
-            Reparto de cajas
-            <small className="muted"> · proporcional a las asistencias; 🎲 = participa en un sorteo; la casilla confirma la entrega</small>
+            Reparto de cajas · {DISTRIBUTIONS[sheet.distribution].name.toLowerCase()}
+            <small className="muted"> · {DISTRIBUTIONS[sheet.distribution].hint}; 🎲 = participa en un sorteo{!activeBlock && '; la casilla confirma la entrega'}</small>
           </h3>
+          {blocks.length > 1 && (
+            <div className="season-pick" style={{ marginBottom: 12 }}>
+              <select className="select" value={activeBlock ? activeBlock.key : 'total'} onChange={(e) => setView(e.target.value)}>
+                <option value="total">Total de la temporada (suma de {blocks.length} repartos)</option>
+                {blocks.map((b) => <option key={b.key} value={b.key}>{b.label}{b.idle ? ' · sin asistentes' : ''}</option>)}
+              </select>
+            </div>
+          )}
+          {(activeBlock ? [activeBlock] : blocks).some((b) => b.idle) && (
+            <p className="form-msg form-msg--error" style={{ marginBottom: 12 }}>
+              Hay botín sin asistentes en: {(activeBlock ? [activeBlock] : blocks).filter((b) => b.idle).map((b) => b.label).join(', ')}. No se puede repartir hasta registrar asistencia.
+            </p>
+          )}
           <div className="card table-wrap">
             <table className="table">
               <thead>
-                <tr><th>Jugador</th><th>Asist.</th>{sheet.lootNames.map((n) => <th key={n}>{n}</th>)}<th>Total</th><th>Entregado</th></tr>
+                <tr><th>Jugador</th><th>Asist.</th>{sheet.lootNames.map((n) => <th key={n}>{n}</th>)}<th>Total</th>{!activeBlock && <th>Entregado</th>}</tr>
               </thead>
               <tbody>
-                {sheet.players.filter((p) => p.count > 0).map((p) => {
-                  const row = sheet.allocation[p.id];
+                {sheet.players.filter((p) => (activeBlock ? activeBlock.counts[p.id] : p.count) > 0).map((p) => {
+                  const row = (activeBlock ? activeBlock.allocation : sheet.allocation)[p.id];
                   return (
                     <tr key={p.id}>
                       <td><b>{p.name}</b></td>
-                      <td>{p.count}</td>
+                      <td>{activeBlock ? activeBlock.counts[p.id] : p.count}</td>
                       {row.map((n, i) => (
                         <td key={i} className="reward">
                           {n}
@@ -268,15 +306,15 @@ export default function Invasions({ me }) {
                         </td>
                       ))}
                       <td><b>{row.reduce((a, b) => a + b, 0)}</b></td>
-                      <td><input type="checkbox" checked={delivered.has(p.id)} onChange={(e) => setDelivery(p, e.target.checked)} /></td>
+                      {!activeBlock && <td><input type="checkbox" checked={delivered.has(p.id)} onChange={(e) => setDelivery(p, e.target.checked)} /></td>}
                     </tr>
                   );
                 })}
                 <tr className="totalrow">
                   <td colSpan="2">TOTALES</td>
-                  {sheet.inventory.map((n, i) => <td key={i}>{n}</td>)}
-                  <td>{sheet.inventory.reduce((a, b) => a + b, 0)}</td>
-                  <td>{sheet.players.filter((p) => p.count > 0 && delivered.has(p.id)).length} / {sheet.players.filter((p) => p.count > 0).length}</td>
+                  {(activeBlock ? activeBlock.inventory : sheet.inventory).map((n, i) => <td key={i}>{n}</td>)}
+                  <td>{(activeBlock ? activeBlock.inventory : sheet.inventory).reduce((a, b) => a + b, 0)}</td>
+                  {!activeBlock && <td>{sheet.players.filter((p) => p.count > 0 && delivered.has(p.id)).length} / {sheet.players.filter((p) => p.count > 0).length}</td>}
                 </tr>
               </tbody>
             </table>

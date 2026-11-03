@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { allocate, raffleOf } = require('../lib/allocation');
+const { distribute } = require('../lib/distribution');
 const { groupDraws } = require('../lib/raffle');
 const { seasonEnd } = require('../lib/dates');
 const { SLOTS, LOOT_NAMES, getSettings, nowIn } = require('../lib/schedule');
@@ -19,9 +19,9 @@ router.get('/mine', async (req, res) => {
   const [seasons, att, loot, delivered, raffle] = await Promise.all([
     db.query('SELECT * FROM seasons ORDER BY start_date DESC'),
     db.query('SELECT season_id, user_id, day, slot FROM invasion_attendance'),
-    db.query('SELECT season_id, category, quantity FROM season_loot'),
+    db.query('SELECT season_id, day, category, quantity FROM season_loot'),
     db.query('SELECT season_id FROM season_delivery WHERE user_id = $1', [me]),
-    db.query('SELECT season_id, category, user_id, pos, pool_key FROM season_raffle'),
+    db.query('SELECT season_id, bucket, category, user_id, pos, pool_key FROM season_raffle'),
   ]);
   const draws = groupDraws(raffle.rows);
   const { day: today } = nowIn((await getSettings()).timezone);
@@ -30,21 +30,24 @@ router.get('/mine', async (req, res) => {
   const report = seasons.rows.map((s) => {
     const end = seasonEnd(s.start_date, s.weeks);
     const rows = att.rows.filter((a) => a.season_id === s.id);
-    const counts = {};
-    rows.forEach((a) => { counts[a.user_id] = (counts[a.user_id] || 0) + 1; });
-    const roster = Object.entries(counts).map(([id, count]) => ({ id: Number(id), count, name: String(id) }));
-
-    const inventory = Array(LOOT_NAMES.length).fill(0);
-    loot.rows.filter((l) => l.season_id === s.id).forEach((l) => { inventory[l.category] += l.quantity; });
-    const boxes = inventory.map((n, c) => allocate(n, roster, draws[s.id]?.[c])[me] || 0);
+    // Mismo cálculo que la planilla (por período, semana o día según la configuración de la temporada).
+    const ids = [...new Set(rows.map((r) => r.user_id))];
+    const dist = distribute({
+      season: s, players: ids.map((id) => ({ id })), attendance: rows,
+      loot: loot.rows.filter((l) => l.season_id === s.id), draws: draws[s.id] || {},
+    });
+    const boxes = dist.shares[me] || Array(LOOT_NAMES.length).fill(0);
     // Sorteos de cajas sobrantes en los que participa el usuario (pendiente, ganado o no salió).
-    const raffles = inventory
-      .map((n, c) => ({ category: c, name: LOOT_NAMES[c], r: raffleOf(n, roster, draws[s.id]?.[c]) }))
-      .filter((x) => x.r && x.r.candidates.includes(me))
-      .map(({ category, name, r }) => ({
-        category, name, slots: r.slots, participants: r.candidates.length,
-        status: !r.winners ? 'pending' : r.winners.includes(me) ? 'won' : 'lost',
-      }));
+    const raffles = dist.raffles
+      .filter((r) => r.candidates.includes(me))
+      .map((r) => {
+        const block = dist.blocks.find((x) => x.key === r.bucket);
+        return {
+          bucket: r.bucket, from: block.days?.[0] || null, to: block.days?.[block.days.length - 1] || null,
+          category: r.category, name: r.name, slots: r.slots, participants: r.candidates.length,
+          status: !r.winners ? 'pending' : r.winners.includes(me) ? 'won' : 'lost',
+        };
+      });
 
     const mine = rows.filter((a) => a.user_id === me);
     const bySlot = Object.fromEntries(SLOTS.map((slot) => [slot, 0]));
@@ -52,7 +55,7 @@ router.get('/mine', async (req, res) => {
     const opportunities = SLOTS.length * 7 * s.weeks;
 
     return {
-      id: s.id, name: s.name, kind: s.kind, start_date: s.start_date, end_date: end, weeks: s.weeks,
+      id: s.id, name: s.name, kind: s.kind, distribution: dist.mode, start_date: s.start_date, end_date: end, weeks: s.weeks,
       current: s.start_date <= today && today <= end,
       attendances: mine.length, opportunities, bySlot,
       attended: mine.map((a) => ({ day: a.day, slot: a.slot.trim() })).sort((a, b) => b.day.localeCompare(a.day) || b.slot.localeCompare(a.slot)),

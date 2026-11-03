@@ -1,7 +1,8 @@
 // Reparto proporcional a las asistencias, con redondeo justo:
 // primero las partes enteras; las cajas restantes van a quienes tengan mayor residuo y luego mayor asistencia.
+//
 // Si el corte cae entre jugadores con la misma asistencia (mismo residuo), esas cajas no se asignan por
-// nombre: quedan "a sorteo" entre ellos (ver `pool`) y solo se entregan cuando hay un sorteo vigente.
+// nombre ni por orden: quedan "a sorteo" entre ellos (ver `pool`) y solo se entregan cuando hay un sorteo vigente.
 //
 // Se usa aritmética entera para que dos jugadores con igual asistencia empaten exactamente.
 function split(boxes, players) {

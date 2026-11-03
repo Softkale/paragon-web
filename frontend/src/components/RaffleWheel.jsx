@@ -38,7 +38,7 @@ function Wheel({ names, rotation, spinning }) {
 
 // Ruleta del sorteo de cajas sobrantes. El resultado lo decide el servidor (queda guardado);
 // la ruleta solo lo muestra girando hasta el ganador.
-export default function RaffleWheel({ seasonId, raffle, nameOf, onClose, onDone }) {
+export default function RaffleWheel({ seasonId, raffle, blockLabel, nameOf, onClose }) {
   const [remaining, setRemaining] = useState(raffle.candidates);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -59,7 +59,7 @@ export default function RaffleWheel({ seasonId, raffle, nameOf, onClose, onDone 
     setPhase('running');
     let winners;
     try {
-      ({ winners } = await api.post(`/seasons/${seasonId}/raffle/${raffle.category}`));
+      ({ winners } = await api.post(`/seasons/${seasonId}/raffle/${raffle.category}?bucket=${encodeURIComponent(raffle.bucket)}`));
     } catch (err) {
       setError(err.message);
       setPhase('ready');
@@ -91,7 +91,7 @@ export default function RaffleWheel({ seasonId, raffle, nameOf, onClose, onDone 
   };
 
   const close = () => onClose(phase === 'done');
-  const label = `${raffle.slots} ${raffle.slots === 1 ? 'caja' : 'cajas'} · ${raffle.name}`;
+  const label = `${raffle.slots} ${raffle.slots === 1 ? 'caja' : 'cajas'} · ${raffle.name}${blockLabel ? ` · ${blockLabel}` : ''}`;
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget && phase !== 'running') close(); }}>

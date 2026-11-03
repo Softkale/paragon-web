@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireAuth, requireRole, requireRecorder } = require('../middleware/auth');
-const { allocate, raffleOf } = require('../lib/allocation');
+const { MODES, distribute } = require('../lib/distribution');
 const { groupDraws, pickWinners } = require('../lib/raffle');
 const { isDate, seasonEnd, seasonDays } = require('../lib/dates');
 const { SLOTS, LOOT_NAMES, getSettings, nowIn, slotState } = require('../lib/schedule');
@@ -19,9 +19,10 @@ async function getSeason(id) {
 }
 
 // Valida nombre, fecha y duración; devuelve el error o null.
-async function validateSeason({ name, kind, start_date, weeks }, ignoreId = 0) {
+async function validateSeason({ name, kind, distribution, start_date, weeks }, ignoreId = 0) {
   if (!name || !name.trim()) return 'El nombre es obligatorio';
   if (!KINDS.includes(kind)) return 'Tipo inválido (liga o sin liga)';
+  if (!MODES.includes(distribution)) return 'Reparto inválido (todo el período, semanal o diario)';
   if (!isDate(start_date)) return 'Fecha de inicio inválida';
   if (!Number.isInteger(weeks) || weeks < 1 || weeks > 4) return 'La duración debe ser de 1 a 4 semanas';
 
@@ -47,12 +48,15 @@ router.get('/', async (_req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const body = { name: req.body?.name, kind: req.body?.kind || 'liga', start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
+  const body = {
+    name: req.body?.name, kind: req.body?.kind || 'liga', distribution: req.body?.distribution || 'periodo',
+    start_date: req.body?.start_date, weeks: Number(req.body?.weeks),
+  };
   const error = await validateSeason(body);
   if (error) return res.status(400).json({ error });
   const { rows } = await db.query(
-    'INSERT INTO seasons (name, kind, start_date, weeks, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [body.name.trim(), body.kind, body.start_date, body.weeks, req.user.id]
+    'INSERT INTO seasons (name, kind, distribution, start_date, weeks, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+    [body.name.trim(), body.kind, body.distribution, body.start_date, body.weeks, req.user.id]
   );
   res.status(201).json(withEnd(rows[0]));
 });
@@ -61,7 +65,10 @@ router.put('/:id', async (req, res) => {
   const season = await getSeason(req.params.id);
   if (!season) return res.status(404).json({ error: 'Temporada no encontrada' });
 
-  const body = { name: req.body?.name, kind: req.body?.kind || 'liga', start_date: req.body?.start_date, weeks: Number(req.body?.weeks) };
+  const body = {
+    name: req.body?.name, kind: req.body?.kind || 'liga', distribution: req.body?.distribution || season.distribution,
+    start_date: req.body?.start_date, weeks: Number(req.body?.weeks),
+  };
   const error = await validateSeason(body, season.id);
   if (error) return res.status(400).json({ error });
 
@@ -73,8 +80,8 @@ router.put('/:id', async (req, res) => {
   if (orphans.rowCount) return res.status(400).json({ error: 'Hay asistencias registradas fuera del nuevo rango de fechas' });
 
   const { rows } = await db.query(
-    'UPDATE seasons SET name = $1, kind = $2, start_date = $3, weeks = $4 WHERE id = $5 RETURNING *',
-    [body.name.trim(), body.kind, body.start_date, body.weeks, season.id]
+    'UPDATE seasons SET name = $1, kind = $2, distribution = $3, start_date = $4, weeks = $5 WHERE id = $6 RETURNING *',
+    [body.name.trim(), body.kind, body.distribution, body.start_date, body.weeks, season.id]
   );
   res.json(withEnd(rows[0]));
 });
@@ -85,8 +92,9 @@ router.delete('/:id', requireRole('admin'), async (req, res) => {
   res.status(204).end();
 });
 
-// Jugadores con su asistencia, botín total por categoría y sorteos guardados: lo que necesita el reparto.
-async function loadAllocationData(seasonId) {
+// Reparto de la temporada (por período, semana o día según su configuración) con asistencias, botín y sorteos guardados.
+async function loadDistribution(season) {
+  const seasonId = season.id;
   const [players, attendance, loot, raffle] = await Promise.all([
     db.query(
       `SELECT id, character_name AS name FROM users
@@ -96,18 +104,17 @@ async function loadAllocationData(seasonId) {
     ),
     db.query('SELECT user_id, day, slot, source FROM invasion_attendance WHERE season_id = $1', [seasonId]),
     db.query('SELECT day, slot, category, quantity FROM season_loot WHERE season_id = $1', [seasonId]),
-    db.query('SELECT season_id, category, user_id, pos, pool_key FROM season_raffle WHERE season_id = $1', [seasonId]),
+    db.query('SELECT season_id, bucket, category, user_id, pos, pool_key FROM season_raffle WHERE season_id = $1', [seasonId]),
   ]);
 
   const counts = {};
   attendance.rows.forEach((a) => { counts[a.user_id] = (counts[a.user_id] || 0) + 1; });
   const roster = players.rows.map((p) => ({ ...p, count: counts[p.id] || 0 }));
 
-  // Total de la temporada por categoría (incluye registros antiguos sin día/horario).
-  const inventory = Array(8).fill(0);
-  loot.rows.forEach((l) => { inventory[l.category] += l.quantity; });
-
-  return { roster, attendance, loot, inventory, draws: groupDraws(raffle.rows)[seasonId] || {} };
+  const dist = distribute({
+    season, players: players.rows, attendance: attendance.rows, loot: loot.rows, draws: groupDraws(raffle.rows)[seasonId] || {},
+  });
+  return { roster, attendance, loot, dist };
 }
 
 // Todo lo necesario para pintar la planilla: asistencias, botín, reparto y entregas.
@@ -115,8 +122,8 @@ router.get('/:id/sheet', async (req, res) => {
   const season = await getSeason(req.params.id);
   if (!season) return res.status(404).json({ error: 'Temporada no encontrada' });
 
-  const [{ roster, attendance, loot, inventory, draws }, delivered] = await Promise.all([
-    loadAllocationData(season.id),
+  const [{ roster, attendance, loot, dist }, delivered] = await Promise.all([
+    loadDistribution(season),
     db.query('SELECT user_id FROM season_delivery WHERE season_id = $1', [season.id]),
   ]);
 
@@ -129,14 +136,10 @@ router.get('/:id/sheet', async (req, res) => {
     }
   });
 
-  const byCategory = inventory.map((n, c) => allocate(n, roster, draws[c]));
-  const allocation = Object.fromEntries(roster.map((p) => [p.id, byCategory.map((c) => c[p.id] || 0)]));
-
-  // Cajas que sobran entre jugadores con la misma asistencia: se sortean (winners = null si aún no se hizo).
-  const raffles = inventory
-    .map((n, c) => ({ category: c, name: LOOT_NAMES[c], ...raffleOf(n, roster, draws[c]) }))
-    .filter((r) => r.candidates)
-    .map(({ key, ...r }) => r);
+  // Bloques de reparto: uno solo (todo el período), uno por semana o uno por día, cada uno con su botín y asistencia.
+  const blocks = dist.blocks.map((b) => ({
+    key: b.key, days: b.days, inventory: b.inventory, counts: b.counts, allocation: b.shares, idle: b.idle,
+  }));
 
   res.json({
     season,
@@ -148,9 +151,12 @@ router.get('/:id/sheet', async (req, res) => {
     checks: attendance.rows.map((a) => `${a.user_id}|${a.day}|${a.slot.trim()}`),
     staffChecks: attendance.rows.filter((a) => a.source === 'staff').map((a) => `${a.user_id}|${a.day}|${a.slot.trim()}`),
     lootByInvasion,
-    inventory,
-    allocation,
-    raffles,
+    inventory: dist.inventory,
+    allocation: dist.shares,
+    distribution: dist.mode,
+    blocks,
+    // Cajas que sobran entre jugadores con la misma asistencia: se sortean (winners = null si aún no se hizo).
+    raffles: dist.raffles,
     delivered: delivered.rows.map((d) => d.user_id),
   });
 });
@@ -305,27 +311,38 @@ router.put('/:id/invasions/:day/:slot/loot', async (req, res) => {
   res.status(204).end();
 });
 
-// Sortea las cajas sobrantes de una categoría entre los jugadores empatados en asistencia.
+// Parámetros del sorteo: categoría en la ruta y bloque (día, semana o '' = todo el período) en ?bucket=.
+function raffleTarget(req) {
+  const category = Number(req.params.category);
+  const bucket = String(req.query.bucket ?? '');
+  if (!Number.isInteger(category) || category < 0 || category >= 8) return null;
+  if (bucket !== '' && bucket !== 'sin-fecha' && !isDate(bucket)) return null;
+  return { category, bucket };
+}
+
+// Sortea las cajas sobrantes de una categoría (en un bloque de reparto) entre los jugadores empatados en asistencia.
 // El resultado queda guardado y no se puede repetir (solo el admin puede anularlo).
 router.post('/:id/raffle/:category', async (req, res) => {
-  const category = Number(req.params.category);
-  if (!Number.isInteger(category) || category < 0 || category >= 8) return res.status(400).json({ error: 'Categoría inválida' });
+  const target = raffleTarget(req);
+  if (!target) return res.status(400).json({ error: 'Sorteo inválido' });
+  const { category, bucket } = target;
 
   const client = await db.pool.connect();
   try {
     await client.query('BEGIN');
     // Bloquea la temporada para que dos sorteos simultáneos no se pisen.
-    const locked = await client.query('SELECT id FROM seasons WHERE id = $1 FOR UPDATE', [req.params.id]);
+    const locked = await client.query('SELECT * FROM seasons WHERE id = $1 FOR UPDATE', [req.params.id]);
     if (!locked.rowCount) {
       await client.query('ROLLBACK');
       return res.status(404).json({ error: 'Temporada no encontrada' });
     }
+    const season = withEnd(locked.rows[0]);
 
-    const { roster, inventory, draws } = await loadAllocationData(locked.rows[0].id);
-    const raffle = raffleOf(inventory[category], roster, draws[category]);
+    const { dist } = await loadDistribution(season);
+    const raffle = dist.raffles.find((r) => r.bucket === bucket && r.category === category);
     if (!raffle) {
       await client.query('ROLLBACK');
-      return res.status(409).json({ error: 'Esta categoría no tiene cajas por sortear' });
+      return res.status(409).json({ error: 'No hay cajas por sortear en esta categoría' });
     }
     if (raffle.winners) {
       await client.query('ROLLBACK');
@@ -334,15 +351,15 @@ router.post('/:id/raffle/:category', async (req, res) => {
 
     const winners = pickWinners(raffle.candidates, raffle.slots);
     // Descarta cualquier sorteo anterior que ya no corresponde al grupo actual.
-    await client.query('DELETE FROM season_raffle WHERE season_id = $1 AND category = $2', [locked.rows[0].id, category]);
+    await client.query('DELETE FROM season_raffle WHERE season_id = $1 AND bucket = $2 AND category = $3', [season.id, bucket, category]);
     for (let pos = 0; pos < winners.length; pos += 1) {
       await client.query(
-        'INSERT INTO season_raffle (season_id, category, user_id, pos, pool_key, drawn_by) VALUES ($1, $2, $3, $4, $5, $6)',
-        [locked.rows[0].id, category, winners[pos], pos, raffle.key, req.user.id]
+        'INSERT INTO season_raffle (season_id, bucket, category, user_id, pos, pool_key, drawn_by) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+        [season.id, bucket, category, winners[pos], pos, raffle.key, req.user.id]
       );
     }
     await client.query('COMMIT');
-    res.json({ category, winners });
+    res.json({ category, bucket, winners });
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
@@ -352,9 +369,9 @@ router.post('/:id/raffle/:category', async (req, res) => {
 });
 
 router.delete('/:id/raffle/:category', requireRole('admin'), async (req, res) => {
-  const category = Number(req.params.category);
-  if (!Number.isInteger(category) || category < 0 || category >= 8) return res.status(400).json({ error: 'Categoría inválida' });
-  await db.query('DELETE FROM season_raffle WHERE season_id = $1 AND category = $2', [req.params.id, category]);
+  const target = raffleTarget(req);
+  if (!target) return res.status(400).json({ error: 'Sorteo inválido' });
+  await db.query('DELETE FROM season_raffle WHERE season_id = $1 AND bucket = $2 AND category = $3', [req.params.id, target.bucket, target.category]);
   res.status(204).end();
 });
 

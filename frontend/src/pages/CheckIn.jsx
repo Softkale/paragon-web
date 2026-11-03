@@ -4,6 +4,7 @@ import Embers from '../components/Embers';
 import MemberBar from '../components/MemberBar';
 import { api } from '../api';
 import { useAuth } from '../AuthContext';
+import { blockLabel, weekNumber } from '../components/blocks';
 
 const fmtDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' });
 const fmtShort = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('es', { day: '2-digit', month: '2-digit' });
@@ -70,7 +71,7 @@ export default function CheckIn() {
             </div>
             {season.raffles.map((r) => (
               <p key={r.category} className={`raffle-note raffle-note--${r.status}`}>
-                🎲 {r.name}: {r.slots} {r.slots === 1 ? 'caja' : 'cajas'} a sorteo entre {r.participants} jugadores con tu misma asistencia
+                🎲 {season.distribution !== 'periodo' && `${blockLabel(season.distribution, r.bucket, r.from, r.to, r.from && weekNumber(season.start_date, r.from))} · `}{r.name}: {r.slots} {r.slots === 1 ? 'caja' : 'cajas'} a sorteo entre {r.participants} jugadores con tu misma asistencia
                 {r.status === 'pending' && ' — aún sin sortear.'}
                 {r.status === 'won' && ' — ¡saliste ganador! Ya está sumada a tus cajas.'}
                 {r.status === 'lost' && ' — esta vez no salió tu nombre.'}
@@ -79,7 +80,12 @@ export default function CheckIn() {
             {season.totalBoxes > 0 && (
               <p className="muted" style={{ marginTop: 8 }}>{season.delivered ? '✓ Tu reparto ya fue entregado.' : 'Tu reparto aún no ha sido entregado.'}</p>
             )}
-            <p className="muted" style={{ marginTop: 6 }}>El reparto es proporcional a tus asistencias y puede cambiar mientras se sigan registrando invasiones.</p>
+            <p className="muted" style={{ marginTop: 6 }}>
+              El reparto es proporcional a tus asistencias
+              {season.distribution === 'diario' && ' de cada día'}
+              {season.distribution === 'semanal' && ' de cada semana'}
+              {' '}y puede cambiar mientras se sigan registrando invasiones.
+            </p>
 
             <h3 className="admin-h" style={{ marginTop: 28 }}>Horarios a los que asististe</h3>
             <div className="slot-grid">

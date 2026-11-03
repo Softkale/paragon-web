@@ -182,6 +182,20 @@ CREATE TABLE IF NOT EXISTS season_raffle (
   PRIMARY KEY (season_id, category, user_id)
 );
 
+-- ---------- Reparto diario o semanal ----------
+-- 'periodo' = una sola bolsa con todo el período (como antes); 'semanal' y 'diario' reparten cada bloque con su propio botín y asistencia.
+ALTER TABLE seasons ADD COLUMN IF NOT EXISTS distribution VARCHAR(7) NOT NULL DEFAULT 'periodo' CHECK (distribution IN ('periodo', 'semanal', 'diario'));
+
+-- Cada sorteo pertenece a un bloque: '' (todo el período), el día (diario) o el primer día de la semana (semanal).
+ALTER TABLE season_raffle ADD COLUMN IF NOT EXISTS bucket VARCHAR(10) NOT NULL DEFAULT '';
+DO $$ BEGIN
+  IF (SELECT count(*) FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+      WHERE i.indrelid = 'season_raffle'::regclass AND i.indisprimary) = 3 THEN
+    ALTER TABLE season_raffle DROP CONSTRAINT season_raffle_pkey;
+    ALTER TABLE season_raffle ADD PRIMARY KEY (season_id, bucket, category, user_id);
+  END IF;
+END $$;
+
 -- ---------- Historial de la asistencia ----------
 -- Cada marca o retiro hecho por un oficial. Los nombres se copian para que el rastro sobreviva si se borra un usuario.
 CREATE TABLE IF NOT EXISTS attendance_log (

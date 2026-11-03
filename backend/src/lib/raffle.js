@@ -1,11 +1,13 @@
 const crypto = require('crypto');
 
-// Agrupa las filas de season_raffle como { [season_id]: { [category]: { key, winners: [ids en orden de salida] } } }.
+// Agrupa las filas de season_raffle como
+// { [season_id]: { [bloque]: { [categoría]: { key, winners: [ids en orden de salida] } } } }.
+// El bloque es '' (todo el período), el día (reparto diario) o el primer día de la semana (reparto semanal).
 function groupDraws(rows) {
   const out = {};
   rows.forEach((r) => {
-    const bySeason = (out[r.season_id] ||= {});
-    const draw = (bySeason[r.category] ||= { key: r.pool_key, winners: [] });
+    const byBlock = ((out[r.season_id] ||= {})[r.bucket] ||= {});
+    const draw = (byBlock[r.category] ||= { key: r.pool_key, winners: [] });
     draw.winners[r.pos] = r.user_id;
   });
   return out;
