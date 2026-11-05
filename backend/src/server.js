@@ -112,7 +112,7 @@ function start(port, tries = 0) {
     ownPort = port;
     fs.writeFileSync(portFile, String(port));
     if (port !== preferred) console.warn(`[aviso] El puerto ${preferred} estaba ocupado: se usa el ${port} (anotado en ${path.basename(portFile)}).`);
-    console.log(`PARAGON en http://${host || 'localhost'}:${port} (${isProd ? 'producción' : 'desarrollo'})`);
+    console.log(`MULITAS en http://${host || 'localhost'}:${port} (${isProd ? 'producción' : 'desarrollo'})`);
   });
   server.once('error', (err) => {
     if (err.code === 'EADDRINUSE' && !strict && tries < MAX_TRIES) {

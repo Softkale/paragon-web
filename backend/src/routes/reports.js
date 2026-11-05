@@ -189,7 +189,7 @@ router.get('/season/:id/export', async (req, res) => {
       ];
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="PARAGON_${safeName}_${type}.csv"`);
+  res.setHeader('Content-Disposition', `attachment; filename="MULITAS_${safeName}_${type}.csv"`);
   res.send(csv(rows));
 });
 

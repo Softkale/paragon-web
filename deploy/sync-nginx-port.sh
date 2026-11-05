@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ajusta nginx al puerto REAL de PARAGON.
+# Ajusta nginx al puerto REAL de MULITAS.
 #
 # Si el puerto 4000 estaba ocupado, el servidor elige otro libre y lo anota en backend/.port.
 # systemd ejecuta este script como root justo después de arrancar (ExecStartPost=+...): lee ese puerto,

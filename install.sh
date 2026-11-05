@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # =====================================================================================
-#  PARAGON · instalador de UN SOLO COMANDO para Debian 12 (sirve también en Ubuntu)
+#  MULITAS · instalador de UN SOLO COMANDO para Debian 12 (sirve también en Ubuntu)
 #
 #  Ejecútalo como root desde la carpeta del proyecto:
 #
-#     bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com \
+#     bash install.sh --domain mulitas.tudominio.com --email tucorreo@dominio.com \
 #                     --admin-name TuUsuario --admin-email tucorreo@dominio.com
 #
 #  Instala y configura TODO: paquetes, Node.js 22, PostgreSQL, nginx, el usuario del servicio, dependencias,
@@ -254,7 +254,7 @@ run chown "$APP_USER:$APP_USER" "$APP_DIR/backend/outbox"
 write_file /etc/systemd/system/paragon.service <<EOF
 # Generado por install.sh
 [Unit]
-Description=PARAGON (web + API)
+Description=MULITAS (web + API)
 After=network.target postgresql.service
 Wants=postgresql.service
 
@@ -320,10 +320,10 @@ if [ "$LOCAL_MAIL" -eq 1 ]; then
   step "Correo de salida propio (Postfix + firma DKIM)"
   [ -n "$DOMAIN" ] || die "--local-mail necesita --domain."
   run bash "$APP_DIR/deploy/setup-local-mail.sh" --domain "$DOMAIN"
-  # PARAGON entrega a 127.0.0.1:25 (sin usuario ni clave); Postfix firma y envía.
+  # MULITAS entrega a 127.0.0.1:25 (sin usuario ni clave); Postfix firma y envía.
   as_app "$APP_DIR/backend" node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --user "" --clear-pass \
-    --from "PARAGON <no-reply@${DOMAIN}>" --app-url "$URL"
-  info "PARAGON configurado para enviar por 127.0.0.1:25. Falta publicar el DKIM y el DNS inverso (ver arriba)"
+    --from "MULITAS <no-reply@${DOMAIN}>" --app-url "$URL"
+  info "MULITAS configurado para enviar por 127.0.0.1:25. Falta publicar el DKIM y el DNS inverso (ver arriba)"
 fi
 
 # Por defecto NO se activa el firewall: en un servidor con otras aplicaciones podría cortar puertos que ya usas.
@@ -369,7 +369,7 @@ fi
 
 # ---------- resumen ----------
 printf '\n%s============================================================%s\n' "$G" "$N"
-printf '%s  PARAGON quedó instalado%s\n' "$B" "$N"
+printf '%s  MULITAS quedó instalado%s\n' "$B" "$N"
 printf '%s============================================================%s\n' "$G" "$N"
 printf '  Web:            %s\n' "$URL"
 if [ -n "$ADMIN_NAME" ]; then

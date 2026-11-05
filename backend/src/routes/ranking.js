@@ -6,7 +6,7 @@ const smash = require('../lib/smash');
 //   GET /api/ranking/gearscore              todos los personajes por GS (page, pageSize, q; by=name busca solo en nicks)
 //   GET /api/ranking/guilds                 lista de clanes (q)
 //   GET /api/ranking/guilds/:name           un clan con sus integrantes
-//   GET /api/ranking/own-guild              nuestro clan (GUILD_NAME en .env, por defecto Paragon)
+//   GET /api/ranking/own-guild              nuestro clan (GUILD_NAME en .env, por defecto Mulitas)
 //   GET /api/ranking/character/:name        ficha y equipamiento de un personaje
 //   GET /api/ranking/item/:file             imagen de un ítem (p. ej. 4-22.gif)
 // Todas admiten ?realm=smash (por defecto) o ?realm=classic.

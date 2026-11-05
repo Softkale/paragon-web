@@ -6,7 +6,7 @@ const MAX_MEMBERS = 100; // tope de integrantes enriquecidos por clan (limita la
 const INDEX_PAGE = 5000; // máximo que acepta el origen por página
 
 const base = () => (process.env.SMASH_API_BASE || 'https://www.smashmu.com').replace(/\/+$/, '');
-const ownGuild = () => process.env.GUILD_NAME || 'Paragon';
+const ownGuild = () => process.env.GUILD_NAME || 'Mulitas';
 
 const CLASS_NAMES = {
   0: 'Dark Wizard', 1: 'Soul Master', 2: 'Grand Master',
@@ -36,7 +36,7 @@ async function fetchJson(path, { retries = 2, timeoutMs = 20000 } = {}) {
     try {
       const res = await fetch(`${base()}${path}`, {
         signal: ctl.signal,
-        headers: { 'User-Agent': 'ParagonWeb/1.0', Accept: 'application/json' },
+        headers: { 'User-Agent': 'MulitasWeb/1.0', Accept: 'application/json' },
       });
       if (!res.ok) {
         const err = new Error(`El origen respondió ${res.status}`);
@@ -203,7 +203,7 @@ function profile(realm, name) {
 function itemImage(file) {
   if (!/^\d{1,3}-\d{1,4}\.gif$/.test(file)) return Promise.resolve(null);
   return cached(`item:${file}`, 24 * 60 * 60_000, async () => {
-    const res = await fetch(`${base()}/en/items/${file}`, { headers: { 'User-Agent': 'ParagonWeb/1.0' }, signal: AbortSignal.timeout(15000) });
+    const res = await fetch(`${base()}/en/items/${file}`, { headers: { 'User-Agent': 'MulitasWeb/1.0' }, signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`El origen respondió ${res.status}`);
     return Buffer.from(await res.arrayBuffer());
   });

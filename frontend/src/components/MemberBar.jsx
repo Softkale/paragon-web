@@ -10,7 +10,7 @@ export default function MemberBar() {
 
   return (
     <header className="checkin__top">
-      <Link to="/" className="checkin__brand"><img src="/img/paragon-logo.jpg" alt="" /><span>PARAGON</span></Link>
+      <Link to="/" className="checkin__brand"><img src="/img/paragon-logo.jpg" alt="" /><span>MULITAS</span></Link>
       <nav className="memberbar__links">
         <NavLink to="/invasiones" activeClassName="is-on">Mi reporte</NavLink>
         <NavLink to="/cajas" activeClassName="is-on">Cajas obtenidas</NavLink>

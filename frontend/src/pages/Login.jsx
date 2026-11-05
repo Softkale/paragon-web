@@ -44,7 +44,7 @@ export default function Login() {
       <Embers count={25} />
       <form className="auth__card" onSubmit={submit}>
         <Link to="/" className="auth__logo">
-          <img src="/img/paragon-logo.jpg" alt="PARAGON" />
+          <img src="/img/paragon-logo.jpg" alt="MULITAS" />
         </Link>
         <h1>{mode === 'login' ? 'Bienvenido de vuelta' : 'Recupera tu contraseña'}</h1>
 

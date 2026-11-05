@@ -1,4 +1,4 @@
-# PARAGON · Guild de Smash MU
+# MULITAS · Guild de Smash MU
 
 Web de la guild: portada pública, control de invasiones (asistencia anotada por el oficial designado, botín y
 reparto de cajas, también en períodos sin liga), reportes, gestión de miembros y panel de administración.
@@ -42,7 +42,7 @@ No hay registro público: las cuentas las crean los oficiales/admins (una a una 
 
 # Instalar en un servidor: UN SOLO COMANDO (Debian 12)
 
-**Antes:** apunta el dominio al servidor (registro **A** con la IP del VPS, ej. `paragon.tudominio.com`) y sube el
+**Antes:** apunta el dominio al servidor (registro **A** con la IP del VPS, ej. `mulitas.tudominio.com`) y sube el
 proyecto al servidor, en cualquier carpeta que **no** esté dentro de `/root` (por ejemplo `/paragon-web`):
 
 ```bash
@@ -53,7 +53,7 @@ git clone URL_DEL_REPOSITORIO /paragon-web        # o cópialo con scp
 
 ```bash
 cd /paragon-web
-bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com \
+bash install.sh --domain mulitas.tudominio.com --email tucorreo@dominio.com \
                 --admin-name TuUsuario --admin-email tucorreo@dominio.com
 ```
 
@@ -84,13 +84,13 @@ se pide cambiarla).
 
 ### ¿El servidor ya aloja otras aplicaciones (PM2, nginx con otros sitios…)?
 
-El instalador está pensado para convivir con ellas. **No afecta a PM2 ni a tus otras apps**, porque PARAGON corre como su
+El instalador está pensado para convivir con ellas. **No afecta a PM2 ni a tus otras apps**, porque MULITAS corre como su
 propio servicio de systemd, con su propio usuario, carpeta y base de datos. En concreto:
 
 | Qué | Cómo se comporta |
 |---|---|
 | **Tus sitios de nginx** | No se modifican ni se reemplazan. Solo se agrega un sitio nuevo (`/etc/nginx/sites-available/paragon`) que responde únicamente al dominio indicado. Antes de recargar nginx se valida la configuración completa (`nginx -t`) y la recarga no corta conexiones |
-| **Puerto** | Si el 4000 lo usa otra app, PARAGON toma otro libre solo y nginx se ajusta |
+| **Puerto** | Si el 4000 lo usa otra app, MULITAS toma otro libre solo y nginx se ajusta |
 | **Paquetes ya instalados** | No se actualizan (`--no-upgrade`): así nginx y PostgreSQL no se reinician por culpa del instalador |
 | **Node.js** | Si ya hay Node 20 o superior se usa; no se reemplaza |
 | **PostgreSQL** | Se crea un usuario y una base propios (`paragon`); las demás bases no se tocan |
@@ -107,7 +107,7 @@ Si el dominio aún no apunta al servidor, instala igual por HTTP y te dice el co
 
 ```bash
 cd /paragon-web
-bash install.sh --update --domain paragon.tudominio.com --email tucorreo@dominio.com
+bash install.sh --update --domain mulitas.tudominio.com --email tucorreo@dominio.com
 ```
 
 Después, entra a la web como administrador y sigue los pasos del panel (ver «Paso 10 · Configurar la web desde el panel»
@@ -176,7 +176,7 @@ Todos los comandos se ejecutan **como `root`** (o antepón `sudo`). Reemplaza lo
 
 **Antes de empezar necesitas:**
 - Un VPS con Debian 12 (1 GB de RAM alcanza) y acceso SSH.
-- Un dominio con un registro **A** apuntando a la IP del VPS (ej. `paragon.tudominio.com`).
+- Un dominio con un registro **A** apuntando a la IP del VPS (ej. `mulitas.tudominio.com`).
 - El código en un repositorio Git privado (recomendado) o la posibilidad de copiarlo con `scp`.
 
 ## Paso 1 · Actualizar el sistema y entrar con seguridad
@@ -275,7 +275,7 @@ npm run setup -- --production --yes --admin-name TuUsuario --admin-email tucorre
 
 ```bash
 cp /opt/paragon/deploy/nginx.conf /etc/nginx/sites-available/paragon
-nano /etc/nginx/sites-available/paragon                 # cambia paragon.tudominio.com por TU_DOMINIO
+nano /etc/nginx/sites-available/paragon                 # cambia mulitas.tudominio.com por TU_DOMINIO
 rm -f /etc/nginx/sites-enabled/default
 ln -s /etc/nginx/sites-available/paragon /etc/nginx/sites-enabled/paragon
 nginx -t && systemctl reload nginx
@@ -394,8 +394,8 @@ Deja la cuenta como admin **activo** con una clave temporal nueva.
 
 ## Correo propio del sistema (sin hosting ni servicios externos)
 
-Con esta opción **PARAGON envía sus propios correos desde el mismo servidor**: instala **Postfix** (solo para enviar,
-no recibe nada de internet) y **OpenDKIM** (firma cada correo). PARAGON se lo entrega a `127.0.0.1:25` y Postfix lo
+Con esta opción **MULITAS envía sus propios correos desde el mismo servidor**: instala **Postfix** (solo para enviar,
+no recibe nada de internet) y **OpenDKIM** (firma cada correo). MULITAS se lo entrega a `127.0.0.1:25` y Postfix lo
 entrega directo al destinatario. No usa el SMTP de ningún hosting ni de Gmail, Brevo, etc. El correo que **llega** a
 tus buzones no cambia: sigue yendo a donde apunte el MX de tu dominio.
 
@@ -403,11 +403,11 @@ tus buzones no cambia: sigue yendo a donde apunte el MX de tu dominio.
 
 ```bash
 # junto con la instalación completa:
-bash install.sh --domain paragon.tudominio.com --email tucorreo@dominio.com --local-mail
+bash install.sh --domain mulitas.tudominio.com --email tucorreo@dominio.com --local-mail
 
 # o, si el sistema ya estaba instalado:
-bash /ruta/del/proyecto/deploy/setup-local-mail.sh --domain paragon.tudominio.com
-cd /ruta/del/proyecto/backend && su paragon -c 'node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --user "" --clear-pass --from "PARAGON <no-reply@paragon.tudominio.com>" --app-url https://paragon.tudominio.com'
+bash /ruta/del/proyecto/deploy/setup-local-mail.sh --domain mulitas.tudominio.com
+cd /ruta/del/proyecto/backend && su paragon -c 'node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --user "" --clear-pass --from "MULITAS <no-reply@mulitas.tudominio.com>" --app-url https://mulitas.tudominio.com'
 ```
 
 Al terminar muestra el **registro DKIM** que debes publicar. Pero hay cosas que **solo puedes hacer fuera del servidor**,
@@ -463,7 +463,7 @@ journalctl -u paragon --since today | grep '\[mail\]'           # lo de hoy
 
 **3. Si dice «Enviado» pero el usuario no lo ve:**
 - Pídele que revise la carpeta de **spam**, y confirma que su correo esté bien escrito (*Miembros → ✏️ Editar*).
-- Usa un **remitente de tu propio dominio** (ej. `PARAGON <no-reply@paragon.lat>`) y, si es posible, el mismo servicio
+- Usa un **remitente de tu propio dominio** (ej. `MULITAS <no-reply@paragon.lat>`) y, si es posible, el mismo servicio
   que gestiona ese dominio. Los remitentes de Gmail/Hotmail enviados desde otro servidor suelen caer en spam.
 - Configura en el DNS del dominio los registros **SPF, DKIM y DMARC** (los da tu proveedor de correo). Sin ellos,
   Gmail y Outlook desconfían de los mensajes.
@@ -509,7 +509,7 @@ El `.env` se genera solo; estas son las variables que puede contener:
 | `FRONTEND_DIST` | Ruta de la web compilada, si no está en `../frontend/dist` |
 | `CORS_ORIGIN` | Solo si sirves la web desde otro dominio |
 | `APP_URL`, `SMTP_*` | Opcionales: se configuran desde el panel; aquí solo si quieres dejarlos fijos |
-| `GUILD_NAME` | Nombre exacto del clan en el juego que se destaca en `/clanes` (por defecto `Paragon`) |
+| `GUILD_NAME` | Nombre exacto del clan en el juego que se destaca en `/clanes` (por defecto `Mulitas`) |
 | `SMASH_API_BASE` | Origen de los datos de rankings (por defecto `https://www.smashmu.com`) |
 
 ## Clanes y rankings (`/clanes`)

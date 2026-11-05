@@ -34,7 +34,7 @@ export default function ChangePassword() {
     <main className="auth">
       <Embers count={25} />
       <form className="auth__card" onSubmit={submit}>
-        <div className="auth__logo"><img src="/img/paragon-logo.jpg" alt="PARAGON" /></div>
+        <div className="auth__logo"><img src="/img/paragon-logo.jpg" alt="MULITAS" /></div>
         <h1>Cambia tu contraseña</h1>
         <p className="auth__hint">
           {user.mustChange

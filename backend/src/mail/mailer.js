@@ -64,7 +64,7 @@ async function saveConfig({ host, port, secure, user, pass, clearPass, from, app
 }
 
 let cached = { sig: '', transporter: null };
-// Nombre con el que PARAGON se presenta al servidor de correo (HELO/EHLO). Por defecto Node usa "[127.0.0.1]",
+// Nombre con el que MULITAS se presenta al servidor de correo (HELO/EHLO). Por defecto Node usa "[127.0.0.1]",
 // y muchos filtros antispam rechazan a un remitente externo que se identifica así. Se usa el dominio de la web.
 function heloName(appUrl) {
   try {

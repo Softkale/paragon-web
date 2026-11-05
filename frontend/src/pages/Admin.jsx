@@ -298,7 +298,7 @@ export default function Admin() {
       <aside className={`sidebar ${menu ? 'is-open' : ''}`}>
         <Link to="/" className="sidebar__brand">
           <img src="/img/paragon-logo.jpg" alt="" />
-          <span>PARAGON</span>
+          <span>MULITAS</span>
         </Link>
         <nav>
           {menuItems.map((s) => (

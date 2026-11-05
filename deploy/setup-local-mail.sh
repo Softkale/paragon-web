@@ -2,11 +2,11 @@
 # =====================================================================================
 #  Correo de salida PROPIO en este servidor: Postfix (solo envío) + firma DKIM (OpenDKIM).
 #
-#  PARAGON entrega sus correos a 127.0.0.1:25 y Postfix los entrega directo al destinatario, sin depender del SMTP
+#  MULITAS entrega sus correos a 127.0.0.1:25 y Postfix los entrega directo al destinatario, sin depender del SMTP
 #  de ningún hosting ni de servicios externos. Es solo para SALIR: el correo que LLEGA a tus buzones sigue yendo a donde
 #  apunte el MX de tu dominio (no se recibe nada en este servidor).
 #
-#    sudo bash deploy/setup-local-mail.sh --domain paragon.tudominio.com
+#    sudo bash deploy/setup-local-mail.sh --domain mulitas.tudominio.com
 #
 #  Opciones:  --domain D (obligatorio)   --selector S (por defecto "paragon")   --force   --dry-run
 #  Es seguro repetirlo. Al terminar muestra el registro DNS de DKIM que debes publicar y qué más configurar.
@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -n "$DOMAIN" ] || die "Indica el dominio:  bash deploy/setup-local-mail.sh --domain paragon.tudominio.com"
+[ -n "$DOMAIN" ] || die "Indica el dominio:  bash deploy/setup-local-mail.sh --domain mulitas.tudominio.com"
 case "$DOMAIN" in *[!A-Za-z0-9.-]*|"") die "Dominio inválido: $DOMAIN" ;; esac
 if [ "$DRY" -eq 0 ]; then
   [ "$(id -u)" -eq 0 ] || die "Ejecútalo como root."
@@ -52,7 +52,7 @@ if [ "$DRY" -eq 0 ] && [ "$PRE_EXISTING" -eq 0 ] && ss -ltn 2>/dev/null | awk '{
 fi
 if [ "$PRE_EXISTING" -eq 1 ] && [ "$FORCE" -eq 0 ]; then
   warn "Postfix ya estaba instalado: NO se cambia su configuración (podría estar en uso por otra cosa)."
-  warn "Puedes usarlo tal cual (PARAGON → 127.0.0.1 puerto 25) o repetir con --force para ajustarlo a este uso."
+  warn "Puedes usarlo tal cual (MULITAS → 127.0.0.1 puerto 25) o repetir con --force para ajustarlo a este uso."
   exit 0
 fi
 
@@ -85,7 +85,7 @@ else
   postconf -e "smtpd_milters = inet:127.0.0.1:8891"
   postconf -e "non_smtpd_milters = inet:127.0.0.1:8891"
 fi
-info "Postfix: no recibe correo de internet, solo envía lo que le entrega PARAGON"
+info "Postfix: no recibe correo de internet, solo envía lo que le entrega MULITAS"
 
 # ---------- 4) DKIM ----------
 step "Firma DKIM (OpenDKIM)"

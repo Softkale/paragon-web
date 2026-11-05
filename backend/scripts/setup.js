@@ -187,7 +187,7 @@ function fixOwnership() {
 }
 
 (async () => {
-  console.log(`PARAGON · asistente de instalación (${production ? 'servidor' : 'desarrollo'})\n`);
+  console.log(`MULITAS · asistente de instalación (${production ? 'servidor' : 'desarrollo'})\n`);
 
   bootstrap.ensureEnvFile();
   require('dotenv').config({ path: bootstrap.ENV_PATH });

@@ -1,7 +1,7 @@
 # /etc/systemd/system/paragon.service
 # Ajusta User y las rutas si instalas en otro lugar.
 [Unit]
-Description=PARAGON (web + API)
+Description=MULITAS (web + API)
 After=network.target postgresql.service
 Wants=postgresql.service
 

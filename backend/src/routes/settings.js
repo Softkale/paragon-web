@@ -20,7 +20,7 @@ router.put('/mail', async (req, res) => {
   // Host vacío = correo desactivado (los mensajes se guardan en backend/outbox).
   if (host && (!Number.isInteger(port) || port < 1 || port > 65535)) return res.status(400).json({ error: 'Puerto inválido (1 a 65535)' });
   if (host && !/^[\w.-]+$/.test(host)) return res.status(400).json({ error: 'Servidor inválido (ej. smtp.gmail.com)' });
-  if (host && !from) return res.status(400).json({ error: 'Indica el remitente (ej. PARAGON <no-reply@tudominio.com>)' });
+  if (host && !from) return res.status(400).json({ error: 'Indica el remitente (ej. MULITAS <no-reply@tudominio.com>)' });
   if (from && !EMAIL_RE.test(from.replace(/^.*<([^>]+)>.*$/, '$1'))) return res.status(400).json({ error: 'El remitente debe incluir un correo válido' });
   if (!/^https?:\/\/[^\s]+$/.test(appUrl)) return res.status(400).json({ error: 'La dirección de la web debe empezar con http:// o https://' });
 

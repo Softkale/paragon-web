@@ -29,7 +29,7 @@ const GROUPS = [
     ['cta_title', 'Título de la llamada final', 80],
     ['cta_text', 'Texto de la llamada final', 200],
     ['cta_button', 'Botón de la llamada final', 30],
-    ['footer_text', 'Texto del pie de página (después de © año PARAGON)', 120],
+    ['footer_text', 'Texto del pie de página (después de © año MULITAS)', 120],
   ] },
 ];
 

@@ -32,7 +32,7 @@ export default function ResetPassword() {
     <main className="auth">
       <Embers count={25} />
       <form className="auth__card" onSubmit={submit}>
-        <Link to="/" className="auth__logo"><img src="/img/paragon-logo.jpg" alt="PARAGON" /></Link>
+        <Link to="/" className="auth__logo"><img src="/img/paragon-logo.jpg" alt="MULITAS" /></Link>
         <h1>Elige tu nueva contraseña</h1>
 
         {!token ? (

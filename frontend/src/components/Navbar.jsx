@@ -28,7 +28,7 @@ export default function Navbar() {
     <header className={`nav ${scrolled ? 'nav--solid' : ''}`}>
       <Link to="/" className="nav__brand">
         <img src="/img/paragon-logo.jpg" alt="" />
-        <span>PARAGON</span>
+        <span>MULITAS</span>
       </Link>
       <nav className={`nav__links ${open ? 'is-open' : ''}`}>
         {links.filter(([href]) => href !== '#unete' || site.cta_url).map(([href, label]) => (href.startsWith('#') ? (

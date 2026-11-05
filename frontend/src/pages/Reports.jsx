@@ -57,7 +57,7 @@ export default function Reports() {
   }, [selected]);
 
   const exportCsv = (type) => {
-    download(`/reports/season/${selected}/export?type=${type}`, `PARAGON_${report.season.name}_${type}.csv`).catch((e) => window.alert(e.message));
+    download(`/reports/season/${selected}/export?type=${type}`, `MULITAS_${report.season.name}_${type}.csv`).catch((e) => window.alert(e.message));
   };
 
   const players = useMemo(() => {

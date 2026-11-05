@@ -8,14 +8,14 @@ const router = express.Router();
 // campo -> [texto por defecto, largo máximo]
 const TEXT_FIELDS = {
   hero_kicker: ['Guild de Smash MU', 60],
-  hero_title: ['PARAGON', 30],
+  hero_title: ['MULITAS', 30],
   hero_subtitle: ['Forjados en fuego. Unidos en cada invasión.', 140],
   hero_primary: ['Únete a la guild', 30],
   hero_secondary: ['Ver eventos', 30],
   events_title: ['Eventos e invasiones', 60],
   ranking_title: ['Salón de leyendas', 60],
   news_title: ['Últimas noticias', 60],
-  cta_title: ['¿Quieres unirte a PARAGON?', 80],
+  cta_title: ['¿Quieres unirte a MULITAS?', 80],
   cta_text: ['Habla con un oficial de la guild para que te den acceso.', 200],
   cta_button: ['Contactar', 30],
   footer_text: ['Guild de Smash MU. Forjados en fuego.', 120],

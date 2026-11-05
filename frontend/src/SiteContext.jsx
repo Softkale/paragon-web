@@ -4,14 +4,14 @@ import { api } from './api';
 // Valores por defecto mientras carga (o si la API no responde): los mismos textos originales.
 const FALLBACK = {
   hero_kicker: 'Guild de Smash MU',
-  hero_title: 'PARAGON',
+  hero_title: 'MULITAS',
   hero_subtitle: 'Forjados en fuego. Unidos en cada invasión.',
   hero_primary: 'Únete a la guild',
   hero_secondary: 'Ver eventos',
   events_title: 'Eventos e invasiones',
   ranking_title: 'Salón de leyendas',
   news_title: 'Últimas noticias',
-  cta_title: '¿Quieres unirte a PARAGON?',
+  cta_title: '¿Quieres unirte a MULITAS?',
   cta_text: 'Habla con un oficial de la guild para que te den acceso.',
   cta_button: 'Contactar',
   cta_url: '',

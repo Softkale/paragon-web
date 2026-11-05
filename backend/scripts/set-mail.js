@@ -2,7 +2,7 @@
 // Solo cambia lo que indiques; el resto se conserva. Lo usa deploy/setup-local-mail.sh.
 //
 //   node scripts/set-mail.js --host 127.0.0.1 --port 25 --secure false --clear-pass --user "" \
-//        --from "PARAGON <no-reply@paragon.lat>" --app-url https://paragon.lat
+//        --from "MULITAS <no-reply@paragon.lat>" --app-url https://paragon.lat
 const { getPublicConfig, saveConfig } = require('../src/mail/mailer');
 
 function parseArgs(argv) {

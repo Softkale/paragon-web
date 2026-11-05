@@ -1,4 +1,4 @@
--- Esquema inicial de PARAGON (PostgreSQL)
+-- Esquema inicial de MULITAS (PostgreSQL)
 
 DO $$ BEGIN
   CREATE TYPE user_role AS ENUM ('admin', 'oficial', 'miembro');
