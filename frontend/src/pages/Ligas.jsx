@@ -53,21 +53,20 @@ function Standing({ g, top, own }) {
             Líder <b>{g.master}</b> · {fmt(g.members)} integrantes · GS del clan {fmt(g.gearScore)}
             {' · '}<Link to={`/clanes/${encodeURIComponent(g.guild)}`}>Ver clan</Link>
           </p>
-          <div className="table-wrap">
-            <table className="table rk-table">
-              <thead><tr><th>Personaje</th><th>Clase</th><th className="num">GS</th><th className="num">Puntos</th></tr></thead>
-              <tbody>
-                {roster.map((r) => (
-                  <tr key={r.name} className={r.counts ? '' : 'lg-off'}>
-                    <td><Link className="rk-guild" to={`/personaje/${encodeURIComponent(r.name)}`}>{r.name}</Link>{r.isMaster && <span className="rk-crown" title="Líder"> ♛</span>}</td>
-                    <td>{r.className}</td>
-                    <td className="num rk-gs">{fmt(r.gearScore)}</td>
-                    <td className="num">{fmt(r.points)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="lg-members">
+            <li className="lg-members__head"><span>Personaje</span><span>GS</span><span>Puntos</span></li>
+            {roster.map((r) => (
+              <li key={r.name} className={r.counts ? '' : 'lg-off'}>
+                <span className="lg-members__who">
+                  <Link to={`/personaje/${encodeURIComponent(r.name)}`}>{r.name}</Link>
+                  {r.isMaster && <span className="rk-crown" title="Líder"> ♛</span>}
+                  <small>{r.className}</small>
+                </span>
+                <span className="rk-gs">{fmt(r.gearScore)}</span>
+                <span className={r.points ? 'lg-gold' : 'rk-dim'}>{fmt(r.points)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </li>

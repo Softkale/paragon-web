@@ -137,7 +137,15 @@
 .lg-roster__meta { color: var(--muted); font-size: .84rem; margin: 10px 0; }
 .lg-roster__meta b { color: var(--text); }
 .lg-roster__meta a { color: var(--gold); }
-.lg-roster .rk-table { min-width: 0; }
+.lg-members { list-style: none; }
+.lg-members li { display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px; gap: 10px; align-items: center; padding: 9px 4px; border-bottom: 1px solid rgba(49, 57, 71, .5); font-variant-numeric: tabular-nums; }
+.lg-members li:last-child { border-bottom: 0; }
+.lg-members li > span:nth-child(n+2) { text-align: right; }
+.lg-members__head { color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; padding-top: 2px !important; border-bottom-color: var(--border) !important; }
+.lg-members__who { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; min-width: 0; }
+.lg-members__who a { color: var(--gold); font-weight: 600; overflow-wrap: anywhere; }
+.lg-members__who a:hover { color: var(--fire); }
+.lg-members__who small { flex-basis: 100%; color: var(--muted); font-size: .76rem; }
 
 .lg-kills h4 { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .lg-kills ul { list-style: none; display: grid; gap: 6px; }
