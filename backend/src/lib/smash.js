@@ -273,9 +273,66 @@ async function guildDetail(realm, name) {
   return { guild: { ...g, mark }, members };
 }
 
+// Ligas de clanes (temporadas PvE): ligas activas, historial y últimas muertes puntuadas. No depende del realm.
+// Se cachea poco tiempo porque el ranking se mueve con cada monster que cae.
+const league = (l) => ({
+  id: l.id,
+  type: num(l.league_type),
+  name: l.name,
+  status: l.status,
+  startsAt: l.starts_at,
+  endsAt: l.ends_at,
+  minMembers: num(l.min_members),
+  minGuildGearScore: num(l.min_guild_gearscore),
+  maxGuilds: num(l.max_guilds),
+  monsters: (l.monsters || []).map((m) => ({ name: m.monster_name, points: num(m.points) })),
+  standings: (l.standings || []).map((g) => ({
+    rank: num(g.rank),
+    guild: g.guild_name,
+    master: g.guild_master,
+    points: num(g.total_points),
+    kills: num(g.total_kills),
+    members: num(g.member_count),
+    gearScore: num(g.guild_gearscore),
+    roster: (g.roster || []).map((r) => ({
+      name: r.name,
+      classId: r.class,
+      className: className(r.class),
+      gearScore: num(r.gearscore),
+      points: num(r.points),
+      isMaster: !!r.is_master,
+      counts: r.counts_for_score !== false,
+    })),
+  })),
+});
+
+function leagues() {
+  return cached('leagues', 60_000, async () => {
+    const data = await fetchJson('/api/guild-leagues');
+    const kills = {};
+    for (const [type, list] of Object.entries(data.recentKillsByLeague || {})) {
+      kills[type] = (list || []).map((k) => ({
+        at: k.killed_at,
+        character: k.character_name,
+        guild: k.guild_name,
+        monster: k.monster_name,
+        points: num(k.points),
+        scored: k.scored !== false,
+        reason: k.reason || null,
+      }));
+    }
+    return {
+      available: data.available !== false,
+      current: (data.current || []).map(league),
+      history: (data.history || []).map(league),
+      recentKills: kills,
+    };
+  });
+}
+
 // Calienta la caché del clan propio para que su página cargue al instante.
 function warmOwnGuild(realm = 'smash') {
   return guildDetail(realm, ownGuild()).catch((e) => console.warn(`[ranking] No se pudo precargar el clan: ${e.message}`));
 }
 
-module.exports = { REALMS, ownGuild, levelRanking, characterIndex, guilds, guildDetail, profile, itemImage, warmOwnGuild };
+module.exports = { REALMS, ownGuild, levelRanking, characterIndex, guilds, guildDetail, profile, itemImage, leagues, warmOwnGuild };

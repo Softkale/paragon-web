@@ -8,7 +8,8 @@ const smash = require('../lib/smash');
 //   GET /api/ranking/guilds/:name           un clan con sus integrantes
 //   GET /api/ranking/own-guild              nuestro clan (GUILD_NAME en .env, por defecto Mulitas)
 //   GET /api/ranking/character/:name        ficha y equipamiento de un personaje
-//   GET /api/ranking/item/:file             imagen de un ítem (p. ej. 4-22.gif)
+//   GET /api/ranking/leagues                ligas de clanes: activas, historial y últimas muertes puntuadas
+//   GET /api/ranking/item/:file            imagen de un ítem (p. ej. 4-22.gif)
 // Todas admiten ?realm=smash (por defecto) o ?realm=classic.
 const router = express.Router();
 
@@ -64,6 +65,10 @@ router.get('/character/:name', handler(async (req, res, realm) => {
   const character = name && name.length <= 20 ? await smash.profile(realm, name) : null;
   if (!character) return res.status(404).json({ error: 'Personaje no encontrado' });
   return reply(res, realm, { character });
+}));
+
+router.get('/leagues', handler(async (_req, res, realm) => {
+  reply(res, realm, await smash.leagues());
 }));
 
 // Las imágenes casi no cambian: se dejan en la caché del navegador un día.

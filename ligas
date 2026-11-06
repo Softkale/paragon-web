@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charSet="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5"/>
+        <link rel="stylesheet" href="/_next/static/css/e55b109cca725674.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" data-precedence="next"/>
+        <link rel="stylesheet" href="/_next/static/css/14dde12e966ee795.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" data-precedence="next"/>
+        <link rel="stylesheet" href="/_next/static/css/abb5fee3664a84d2.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" data-precedence="next"/>
+        <link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack-8d35499f40b6d01e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw"/>
+        <script src="/_next/static/chunks/4bd1b696-2135e4d8b8354323.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/31255-6fbeaae3196880a8.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/main-app-abf71c5d868c84e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/28121-b079c0ad796be71d.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/app/layout-0c32744f3cfc8fa2.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/app/%5Blang%5D/ligas/page-9a085e9943353c40.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/86974-e8b1abd5de5c589f.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/86827-e2140079d5746223.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <script src="/_next/static/chunks/app/%5Blang%5D/page-3cb07a7d6eaccc81.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" async=""></script>
+        <link rel="dns-prefetch" href="https://img.youtube.com"/>
+        <meta name="theme-color" content="#161516"/>
+        <script>
+            (function() {
+                if (typeof window !== 'undefined') {
+                    window.addEventListener('error', function(event) {
+                        if (event.target && event.target.tagName === 'IMG') {
+                            console.error('[Error de imagen]', event.target.src);
+                        }
+                    }, true);
+                }
+            }
+            )();
+        </script>
+        <script src="/_next/static/chunks/polyfills-42372ed130431b0a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" noModule=""></script>
+    </head>
+    <body class="antialiased">
+        <div hidden="">
+            <!--$?-->
+            <template id="B:0"></template>
+            <!--/$-->
+        </div>
+        <script>
+            ( (a, b, c, d, e, f, g, h) => {
+                let i = document.documentElement
+                  , j = ["light", "dark"];
+                function k(b) {
+                    var c;
+                    (Array.isArray(a) ? a : [a]).forEach(a => {
+                        let c = "class" === a
+                          , d = c && f ? e.map(a => f[a] || a) : e;
+                        c ? (i.classList.remove(...d),
+                        i.classList.add(f && f[b] ? f[b] : b)) : i.setAttribute(a, b)
+                    }
+                    ),
+                    c = b,
+                    h && j.includes(c) && (i.style.colorScheme = c)
+                }
+                if (d)
+                    k(d);
+                else
+                    try {
+                        let a = localStorage.getItem(b) || c
+                          , d = g && "system" === a ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : a;
+                        k(d)
+                    } catch (a) {}
+            }
+            )("class", "theme", "dark", null, ["light", "dark"], null, true, true)
+        </script>
+        <div lang="es" class="    antialiased"></div>
+        <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events:none">
+            <ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol>
+        </div>
+        <script>
+            requestAnimationFrame(function() {
+                $RT = performance.now()
+            });
+        </script>
+        <script src="/_next/static/chunks/webpack-8d35499f40b6d01e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw" id="_R_" async=""></script>
+        <title>MU Online Season 6 - SMASH MU | Servidor Mu Online 60 FPS | SMASH MU</title>
+        <meta name="description" content="Juga MU Online Season 6 en SMASH MU, servidor privado de la comunidad Smashdota con 60 FPS reales, cliente renovado, PvP balanceado, Castle Siege, Crywolf, Chaos Castle, rankings en vivo, guilds y eventos automaticos."/>
+        <meta name="application-name" content="SMASH MU"/>
+        <link rel="author" href="https://www.smashmu.com"/>
+        <meta name="author" content="SMASH MU Team"/>
+        <link rel="manifest" href="/manifest.json"/>
+        <meta name="keywords" content="MU Online Season 6,Mu Online Season 6,MU Online,Mu Online,servidor MU Online Season 6,Mu Online 60 FPS,Mu Online 2026,Mu Online PvP,Mu Online moderno,Mu Online renovado,descargar MU Online gratis,servidor MU Online,servidor privado MU Online,mejor servidor MU Online,MU Online latino,MU Online español,MU Online Argentina,MU Online México,MU Online Chile,MU Online Castle Siege,MU Online Crywolf,MU Online Chaos Castle,MU Online nuevo,MU Online guilds,MU Online rankings,MU Online cliente nuevo,SMASH MU,SMASH MU,MU Online Dark Lord,MU Online Dark Knight,MU Online Blade Master,MU Online Grand Master,MU Online Elf,MU Online High Elf,MU Online Magic Gladiator,MU Online Summoner,MU Online Rage Fighter,MU Online Kundun,Smashdota,comunidad Smashdota"/>
+        <meta name="referrer" content="origin-when-cross-origin"/>
+        <meta name="creator" content="SMASH MU"/>
+        <meta name="publisher" content="SMASH MU"/>
+        <meta name="robots" content="index, follow"/>
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"/>
+        <meta name="category" content="games"/>
+        <link rel="canonical" href="https://www.smashmu.com/es"/>
+        <link rel="alternate" hrefLang="es-ES" href="https://www.smashmu.com/es"/>
+        <link rel="alternate" hrefLang="en-US" href="https://www.smashmu.com/en"/>
+        <link rel="alternate" hrefLang="pt-BR" href="https://www.smashmu.com/pt"/>
+        <link rel="alternate" hrefLang="x-default" href="https://www.smashmu.com/es"/>
+        <meta name="format-detection" content="telephone=no, address=no, email=no"/>
+        <meta property="og:title" content="MU Online Season 6 | SMASH MU 60 FPS"/>
+        <meta property="og:description" content="Servidor MU Online Season 6 gratis de la comunidad Smashdota: 60 FPS reales, PvP balanceado, Castle Siege, eventos automaticos, rankings y comunidad activa."/>
+        <meta property="og:url" content="https://www.smashmu.com/es"/>
+        <meta property="og:site_name" content="SMASH MU"/>
+        <meta property="og:locale" content="es_ES"/>
+        <meta property="og:image" content="https://www.smashmu.com/og-image.png"/>
+        <meta property="og:image:width" content="1200"/>
+        <meta property="og:image:height" content="630"/>
+        <meta property="og:image:type" content="image/png"/>
+        <meta property="og:image:alt" content="MU Online Season 6 | SMASH MU 60 FPS"/>
+        <meta property="og:type" content="website"/>
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content="MU Online Season 6 | SMASH MU 60 FPS"/>
+        <meta name="twitter:description" content="Servidor MU Online Season 6 gratis de la comunidad Smashdota: 60 FPS reales, PvP balanceado, Castle Siege, eventos automaticos, rankings y comunidad activa."/>
+        <meta name="twitter:image" content="https://www.smashmu.com/og-image.png"/>
+        <link rel="icon" href="/favicon.ico" sizes="any"/>
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png"/>
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png"/>
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png" sizes="180x180"/>
+        <script>
+            document.querySelectorAll('body link[rel="icon"], body link[rel="apple-touch-icon"]').forEach(el => document.head.appendChild(el))
+        </script>
+        <div hidden id="S:0"></div>
+        <script>
+            $RB = [];
+            $RV = function(a) {
+                $RT = performance.now();
+                for (var b = 0; b < a.length; b += 2) {
+                    var c = a[b]
+                      , e = a[b + 1];
+                    null !== e.parentNode && e.parentNode.removeChild(e);
+                    var f = c.parentNode;
+                    if (f) {
+                        var g = c.previousSibling
+                          , h = 0;
+                        do {
+                            if (c && 8 === c.nodeType) {
+                                var d = c.data;
+                                if ("/$" === d || "/&" === d)
+                                    if (0 === h)
+                                        break;
+                                    else
+                                        h--;
+                                else
+                                    "$" !== d && "$?" !== d && "$~" !== d && "$!" !== d && "&" !== d || h++
+                            }
+                            d = c.nextSibling;
+                            f.removeChild(c);
+                            c = d
+                        } while (c);
+                        for (; e.firstChild; )
+                            f.insertBefore(e.firstChild, c);
+                        g.data = "$";
+                        g._reactRetry && requestAnimationFrame(g._reactRetry)
+                    }
+                }
+                a.length = 0
+            }
+            ;
+            $RC = function(a, b) {
+                if (b = document.getElementById(b))
+                    (a = document.getElementById(a)) ? (a.previousSibling.data = "$~",
+                    $RB.push(a, b),
+                    2 === $RB.length && ("number" !== typeof $RT ? requestAnimationFrame($RV.bind(null, $RB)) : (a = performance.now(),
+                    setTimeout($RV.bind(null, $RB), 2300 > a && 2E3 < a ? 2300 - a : $RT + 300 - a)))) : b.parentNode.removeChild(b)
+            }
+            ;
+            $RC("B:0", "S:0")
+        </script>
+        <script>
+            (self.__next_f = self.__next_f || []).push([0])
+        </script>
+        <script>
+            self.__next_f.push([1, "1:\"$Sreact.fragment\"\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "2:I[81901,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"ThemeProvider\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "3:I[8953,[\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"28121\",\"static/chunks/28121-b079c0ad796be71d.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"7177\",\"static/chunks/app/layout-0c32744f3cfc8fa2.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"AuthProvider\"]\n4:I[9766,[],\"\"]\n5:I[98924,[],\"\"]\n7:I[97687,[\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"28121\",\"static/chunks/28121-b079c0ad796be71d.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"7177\",\"static/chunks/app/layout-0c32744f3cfc8fa2.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"Toaster\"]\n9:I[81959,[],\"ClientPageRoot\"]\na:I[363,[\"78892\",\"static/chunks/app/%5Blang%5D/ligas/page-9a085e9943353c40.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"default\"]\nb:I[24431,[],\"OutletBoundary\"]\nd:I[15278,[],\"AsyncMetadataOutlet\"]\nf:I[24431,[],\"ViewportBoundary\"]\n11:I[24431,[],\"MetadataBoundary\"]\n12:\"$Sreact.suspense\"\n14:I[57150,[],\"\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "15:I[81356,[\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"86974\",\"static/chunks/86974-e8b1abd5de5c589f.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"86827\",\"static/chunks/86827-e2140079d5746223.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"911\",\"static/chunks/app/%5Blang%5D/page-3cb07a7d6eaccc81.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"Image\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "16:I[52619,[\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"86974\",\"static/chunks/86974-e8b1abd5de5c589f.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"86827\",\"static/chunks/86827-e2140079d5746223.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"911\",\"static/chunks/app/%5Blang%5D/page-3cb07a7d6eaccc81.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "17:I[22580,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"TrafficCapture\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "18:I[41402,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1d:I[35065,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"ServerProvider\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1e:I[22541,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"NewsProvider\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1f:I[51479,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"default\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "20:I[97053,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"PreloaderWrapper\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "21:I[73334,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"Navbar\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "22:I[18503,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"Footer\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "23:I[46581,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"default\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "24:I[82784,[\"25730\",\"static/chunks/44530001-2a0f497be15023fb.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"66711\",\"static/chunks/8e1d74a4-bad27c0fc580f3e9.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52619\",\"static/chunks/52619-c48a18d6f62d2371.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"24909\",\"static/chunks/24909-6aa4f029ab6db5dc.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81029\",\"static/chunks/81029-61f154501228d6ea.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"70445\",\"static/chunks/70445-1bc6dafde1db67da.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"68362\",\"static/chunks/68362-7e0b8b0b7a52d05e.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"91600\",\"static/chunks/91600-8058f59696e4eecf.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"87624\",\"static/chunks/87624-0d0e68b4ff5fc676.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"69120\",\"static/chunks/69120-6684883a54c8d8b5.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"59558\",\"static/chunks/59558-c479c489687a2b46.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"81356\",\"static/chunks/81356-7c38aebb6a8d5415.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"52238\",\"static/chunks/52238-9714e85923a7b59a.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"51605\",\"static/chunks/51605-e5bf168dfba99329.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"76651\",\"static/chunks/76651-44f4ee6f2e01f6d4.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"65160\",\"static/chunks/app/%5Blang%5D/layout-06558932db2f6654.js?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\"],\"FloatingButtons\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "28:I[80622,[],\"IconMark\"]\n:HL[\"/_next/static/css/e55b109cca725674.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"style\"]\n:HL[\"/_next/static/css/14dde12e966ee795.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"style\"]\n:HL[\"/_next/static/css/abb5fee3664a84d2.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"style\"]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "0:{\"P\":null,\"b\":\"8absfwgABwt7D_sWgOL9D\",\"p\":\"\",\"c\":[\"\",\"es\",\"ligas\"],\"i\":false,\"f\":[[[\"\",{\"children\":[[\"lang\",\"es\",\"d\"],{\"children\":[\"ligas\",{\"children\":[\"__PAGE__\",{}]}]}]},\"$undefined\",\"$undefined\",true],[\"\",[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/e55b109cca725674.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/14dde12e966ee795.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"es\",\"suppressHydrationWarning\":true,\"children\":[[\"$\",\"head\",null,{\"children\":[[\"$\",\"link\",null,{\"rel\":\"dns-prefetch\",\"href\":\"https://img.youtube.com\"}],[\"$\",\"script\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"\\n              (function() {\\n                if (typeof window !== 'undefined') {\\n                  window.addEventListener('error', function(event) {\\n                    if (event.target \u0026\u0026 event.target.tagName === 'IMG') {\\n                      console.error('[Error de imagen]', event.target.src);\\n                    }\\n                  }, true);\\n                }\\n              })();\\n            \"}}]]}],[\"$\",\"body\",null,{\"className\":\"antialiased\",\"children\":[\"$\",\"$L2\",null,{\"attribute\":\"class\",\"defaultTheme\":\"dark\",\"enableSystem\":true,\"disableTransitionOnChange\":true,\"children\":[\"$\",\"$L3\",null,{\"children\":[[\"$\",\"$L4\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L5\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$L6\",[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}],[\"$\",\"$L7\",null,{}]]}]}]}]]}]]}],{\"children\":[[\"lang\",\"es\",\"d\"],[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/abb5fee3664a84d2.css?dpl=dpl_6u9Z5CviD9QCLqNSwtV4zuWJ3Stw\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}]],\"$L8\"]}],{\"children\":[\"ligas\",[\"$\",\"$1\",\"c\",{\"children\":[null,[\"$\",\"$L4\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L5\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]]}],{\"children\":[\"__PAGE__\",[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L9\",null,{\"Component\":\"$a\",\"searchParams\":{},\"params\":{\"lang\":\"es\"}}],null,[\"$\",\"$Lb\",null,{\"children\":[\"$Lc\",[\"$\",\"$Ld\",null,{\"promise\":\"$@e\"}]]}]]}],{},null,false]},null,false]},null,false]},null,false],[\"$\",\"$1\",\"h\",{\"children\":[null,[[\"$\",\"$Lf\",null,{\"children\":\"$L10\"}],null],[\"$\",\"$L11\",null,{\"children\":[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$12\",null,{\"fallback\":null,\"children\":\"$L13\"}]}]}]]}],false]],\"m\":\"$undefined\",\"G\":[\"$14\",[]],\"s\":false,\"S\":false}\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "6:[\"$\",\"main\",null,{\"className\":\"relative grid min-h-screen place-items-center overflow-hidden bg-bunker-950 px-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"absolute inset-0 smash-hero-bg\"}],[\"$\",\"div\",null,{\"className\":\"absolute inset-0 smash-bg-grid\"}],[\"$\",\"div\",null,{\"className\":\"absolute inset-0 bg-gradient-to-b from-bunker-950/30 via-bunker-950/70 to-bunker-950\"}],[\"$\",\"section\",null,{\"className\":\"relative z-10 mx-auto max-w-lg text-center\",\"children\":[[\"$\",\"$L15\",null,{\"src\":\"/smash-logo.png\",\"alt\":\"SMASH MU\",\"width\":150,\"height\":150,\"className\":\"mx-auto mb-8 h-28 w-auto\"}],[\"$\",\"p\",null,{\"className\":\"mb-3 text-sm font-bold uppercase tracking-[0.3em] text-[#06d6a0]\",\"children\":\"Error 404\"}],[\"$\",\"h1\",null,{\"className\":\"mb-4 text-4xl font-black text-white md:text-5xl\",\"children\":\"Pagina no encontrada\"}],[\"$\",\"p\",null,{\"className\":\"mx-auto mb-8 max-w-md text-bunker-300\",\"children\":\"La ruta que intentaste abrir no existe o fue movida.\"}],[\"$\",\"$L16\",null,{\"href\":\"/es\",\"className\":\"smash-btn\",\"children\":\"Volver al inicio\"}]]}]]}]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "19:T5cf,"])
+        </script>
+        <script>
+            self.__next_f.push([1, "{\"@context\":\"https://schema.org\",\"@type\":\"VideoGame\",\"name\":\"SMASH MU\",\"alternateName\":[\"MU Online Season 6\",\"Mu Online\",\"Servidor MU Online Season 6\",\"SMASH MU Online\",\"SMASH MU MU\"],\"description\":\"SMASH MU es un servidor MU Online Season 6 de la comunidad Smashdota con 60 FPS reales, cliente pulido, PvP balanceado, eventos automaticos, Castle Siege, Crywolf, Chaos Castle, economia estable y sistema de guilds.\",\"url\":\"https://www.smashmu.com\",\"image\":\"https://www.smashmu.com/smash-logo.png\",\"inLanguage\":[\"es\",\"en\",\"pt\"],\"genre\":[\"MMORPG\",\"Fantasy\",\"Action RPG\",\"PvP\"],\"gamePlatform\":\"PC\",\"operatingSystem\":\"Windows 10, Windows 11\",\"applicationCategory\":\"Game\",\"applicationSubCategory\":\"MMORPG\",\"offers\":{\"@type\":\"Offer\",\"price\":\"0\",\"priceCurrency\":\"USD\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://www.smashmu.com/es/download\"},\"aggregateRating\":{\"@type\":\"AggregateRating\",\"ratingValue\":\"4.9\",\"ratingCount\":\"2450\",\"bestRating\":\"5\",\"worstRating\":\"1\"},\"author\":{\"@type\":\"Organization\",\"name\":\"SMASH MU Team\",\"url\":\"https://www.smashmu.com\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"SMASH MU\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://www.smashmu.com/smash-logo.png\"}},\"playMode\":[\"MultiPlayer\",\"CoOp\"],\"characterAttribute\":[\"Dark Wizard\",\"Soul Wizard\",\"Dark Knight\",\"Blade Knight\",\"Blade Master\",\"Elf\",\"Muse Elf\",\"High Elf\",\"Magic Gladiator\",\"Duel Master\",\"Dark Lord\",\"Lord Emperor\",\"Summoner\",\"Bloody Summoner\",\"Dimension Master\",\"Rage Fighter\",\"Fist Master\"]}"])
+        </script>
+        <script>
+            self.__next_f.push([1, "8:[\"$\",\"div\",null,{\"lang\":\"es\",\"className\":\"    antialiased\",\"children\":[[\"$\",\"$L17\",null,{}],[\"$\",\"$L18\",null,{\"id\":\"structured-data-website\",\"type\":\"application/ld+json\",\"dangerouslySetInnerHTML\":{\"__html\":\"{\\\"@context\\\":\\\"https://schema.org\\\",\\\"@type\\\":\\\"WebSite\\\",\\\"name\\\":\\\"SMASH MU\\\",\\\"alternateName\\\":[\\\"MU Online Season 6\\\",\\\"Mu Online\\\",\\\"Servidor MU Online Season 6\\\",\\\"SMASH Mu Online\\\",\\\"SMASH MU\\\"],\\\"url\\\":\\\"https://www.smashmu.com\\\",\\\"description\\\":\\\"SMASH MU - servidor MU Online Season 6 de la comunidad Smashdota con 60 FPS reales, cliente renovado, PvP balanceado, Castle Siege, rankings y eventos automaticos.\\\",\\\"inLanguage\\\":[\\\"es\\\",\\\"en\\\",\\\"pt\\\"],\\\"potentialAction\\\":{\\\"@type\\\":\\\"SearchAction\\\",\\\"target\\\":{\\\"@type\\\":\\\"EntryPoint\\\",\\\"urlTemplate\\\":\\\"https://www.smashmu.com/es/noticias?q={search_term_string}\\\"},\\\"query-input\\\":\\\"required name=search_term_string\\\"},\\\"publisher\\\":{\\\"@type\\\":\\\"Organization\\\",\\\"name\\\":\\\"SMASH MU\\\",\\\"url\\\":\\\"https://www.smashmu.com\\\",\\\"logo\\\":{\\\"@type\\\":\\\"ImageObject\\\",\\\"url\\\":\\\"https://www.smashmu.com/smash-logo.png\\\",\\\"width\\\":512,\\\"height\\\":512}}}\"}}],[\"$\",\"$L18\",null,{\"id\":\"structured-data-game\",\"type\":\"application/ld+json\",\"dangerouslySetInnerHTML\":{\"__html\":\"$19\"}}],[\"$\",\"$L18\",null,{\"id\":\"structured-data-organization\",\"type\":\"application/ld+json\",\"dangerouslySetInnerHTML\":{\"__html\":\"{\\\"@context\\\":\\\"https://schema.org\\\",\\\"@type\\\":\\\"Organization\\\",\\\"name\\\":\\\"SMASH MU\\\",\\\"alternateName\\\":[\\\"SMASH MU\\\",\\\"MU Online Season 6\\\",\\\"Mu Online\\\"],\\\"url\\\":\\\"https://www.smashmu.com\\\",\\\"logo\\\":{\\\"@type\\\":\\\"ImageObject\\\",\\\"url\\\":\\\"https://www.smashmu.com/smash-logo.png\\\",\\\"width\\\":512,\\\"height\\\":512},\\\"description\\\":\\\"Proyecto de SMASH MU impulsado por la comunidad Smashdota: servidor privado MU Online Season 6 con 60 FPS reales.\\\",\\\"foundingDate\\\":\\\"2024\\\",\\\"contactPoint\\\":{\\\"@type\\\":\\\"ContactPoint\\\",\\\"contactType\\\":\\\"customer support\\\",\\\"availableLanguage\\\":[\\\"Spanish\\\",\\\"English\\\",\\\"Portuguese\\\"],\\\"url\\\":\\\"https://discord.gg/gUSvWy4424\\\"},\\\"sameAs\\\":[\\\"https://discord.gg/gUSvWy4424\\\"]}\"}}],\"$L1a\",\"$L1b\"]}]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1c:T9c9,"])
+        </script>
+        <script>
+            self.__next_f.push([1, "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"¿Qué es SMASH MU?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"SMASH MU es la evolución moderna de MU Online: una experiencia basada en Season 6 completamente renovada con 60 FPS reales, cliente pulido, PvP balanceado, eventos automáticos únicos y una comunidad activa de jugadores hispanos y latinos. Es gratis para jugar.\"}},{\"@type\":\"Question\",\"name\":\"¿Cómo descargar MU Online gratis?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Podés descargar el cliente de SMASH MU de forma totalmente gratuita desde nuestra sección de descargas. El instalador es ligero, se actualiza automáticamente y está optimizado para correr a 60 FPS reales en Windows 10 y Windows 11.\"}},{\"@type\":\"Question\",\"name\":\"¿Qué versión de MU Online tiene SMASH MU?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"SMASH MU está basado en Season 6 con agregados únicos y exclusivos: sistema de 60 FPS reales, cliente renovado, skills reequilibradas, efectos visuales mejorados, eventos propios y mecánicas modernas adaptadas. Lo mejor del MU clásico con las mejoras que siempre quisiste.\"}},{\"@type\":\"Question\",\"name\":\"¿SMASH MU es pay to win?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. SMASH MU mantiene un balance estricto: todo lo importante se consigue jugando. Las donaciones permiten cosméticos, personalización de perfil y ventajas menores sin romper el PvP.\"}},{\"@type\":\"Question\",\"name\":\"¿Tiene Castle Siege y eventos?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Sí. SMASH MU tiene Castle Siege semanal, Crywolf, Chaos Castle, Blood Castle, Devil Square, Illusion Temple, Imperial Fortress, Kanturu, eventos de guild, Battleground y torneos PvP organizados semanalmente con premios en Coins y Goblin Points.\"}},{\"@type\":\"Question\",\"name\":\"¿Qué hace único a SMASH MU frente a otros servidores de MU?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"SMASH MU corre a 60 FPS reales (no simulados), tiene un cliente renovado con mejor performance, PvP balanceado que no es pay to win, eventos exclusivos, sistema de videos de la comunidad con recompensas, Hall of Fame de torneos, perfil de jugador avanzado y soporte en 3 idiomas.\"}},{\"@type\":\"Question\",\"name\":\"¿Puedo jugar con amigos desde diferentes países?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Sí. El servidor está optimizado para jugadores de Latinoamérica, España, Brasil y el mundo entero con una infraestructura estable para la comunidad.\"}}]}"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1a:[\"$\",\"$L18\",null,{\"id\":\"structured-data-faq\",\"type\":\"application/ld+json\",\"dangerouslySetInnerHTML\":{\"__html\":\"$1c\"}}]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "1b:[\"$\",\"$L2\",null,{\"attribute\":\"class\",\"defaultTheme\":\"dark\",\"enableSystem\":true,\"disableTransitionOnChange\":true,\"children\":[\"$\",\"$L1d\",null,{\"children\":[\"$\",\"$L1e\",null,{\"lang\":\"es\",\"children\":[\"$\",\"$L1f\",null,{\"children\":[\"$\",\"$L20\",null,{\"children\":[[\"$\",\"$L21\",null,{\"lang\":\"es\"}],[\"$\",\"main\",null,{\"className\":\"min-h-screen\",\"children\":[\"$\",\"$L4\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L5\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}],[\"$\",\"$L22\",null,{\"lang\":\"es\"}],[\"$\",\"$L23\",null,{}],[\"$\",\"$L24\",null,{\"lang\":\"es\"}]]}]}]}]}]}]\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "10:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1, maximum-scale=5\"}],[\"$\",\"meta\",\"2\",{\"name\":\"theme-color\",\"content\":\"#161516\"}]]\nc:null\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "e:{\"metadata\":[[\"$\",\"title\",\"0\",{\"children\":\"MU Online Season 6 - SMASH MU | Servidor Mu Online 60 FPS | SMASH MU\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"Juga MU Online Season 6 en SMASH MU, servidor privado de la comunidad Smashdota con 60 FPS reales, cliente renovado, PvP balanceado, Castle Siege, Crywolf, Chaos Castle, rankings en vivo, guilds y eventos automaticos.\"}],[\"$\",\"meta\",\"2\",{\"name\":\"application-name\",\"content\":\"SMASH MU\"}],[\"$\",\"link\",\"3\",{\"rel\":\"author\",\"href\":\"https://www.smashmu.com\"}],[\"$\",\"meta\",\"4\",{\"name\":\"author\",\"content\":\"SMASH MU Team\"}],[\"$\",\"link\",\"5\",{\"rel\":\"manifest\",\"href\":\"/manifest.json\",\"crossOrigin\":\"$undefined\"}],[\"$\",\"meta\",\"6\",{\"name\":\"keywords\",\"content\":\"MU Online Season 6,Mu Online Season 6,MU Online,Mu Online,servidor MU Online Season 6,Mu Online 60 FPS,Mu Online 2026,Mu Online PvP,Mu Online moderno,Mu Online renovado,descargar MU Online gratis,servidor MU Online,servidor privado MU Online,mejor servidor MU Online,MU Online latino,MU Online español,MU Online Argentina,MU Online México,MU Online Chile,MU Online Castle Siege,MU Online Crywolf,MU Online Chaos Castle,MU Online nuevo,MU Online guilds,MU Online rankings,MU Online cliente nuevo,SMASH MU,SMASH MU,MU Online Dark Lord,MU Online Dark Knight,MU Online Blade Master,MU Online Grand Master,MU Online Elf,MU Online High Elf,MU Online Magic Gladiator,MU Online Summoner,MU Online Rage Fighter,MU Online Kundun,Smashdota,comunidad Smashdota\"}],[\"$\",\"meta\",\"7\",{\"name\":\"referrer\",\"content\":\"origin-when-cross-origin\"}],[\"$\",\"meta\",\"8\",{\"name\":\"creator\",\"content\":\"SMASH MU\"}],[\"$\",\"meta\",\"9\",{\"name\":\"publisher\",\"content\":\"SMASH MU\"}],[\"$\",\"meta\",\"10\",{\"name\":\"robots\",\"content\":\"index, follow\"}],[\"$\",\"meta\",\"11\",{\"name\":\"googlebot\",\"content\":\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"}],[\"$\",\"meta\",\"12\",{\"name\":\"category\",\"content\":\"games\"}],[\"$\",\"link\",\"13\",{\"rel\":\"canonical\",\"href\":\"https://www.smashmu.com/es\"}],[\"$\",\"link\",\"14\",{\"rel\":\"alternate\",\"hrefLang\":\"es-ES\",\"href\":\"https://www.smashmu.com/es\"}],[\"$\",\"link\",\"15\",{\"rel\":\"alternate\",\"hrefLang\":\"en-US\",\"href\":\"https://www.smashmu.com/en\"}],[\"$\",\"link\",\"16\",{\"rel\":\"alternate\",\"hrefLang\":\"pt-BR\",\"href\":\"https://www.smashmu.com/pt\"}],[\"$\",\"link\",\"17\",{\"rel\":\"alternate\",\"hrefLang\":\"x-default\",\"href\":\"https://www.smashmu.com/es\"}],[\"$\",\"meta\",\"18\",{\"name\":\"format-detection\",\"content\":\"telephone=no, address=no, email=no\"}],[\"$\",\"meta\",\"19\",{\"property\":\"og:title\",\"content\":\"MU Online Season 6 | SMASH MU 60 FPS\"}],[\"$\",\"meta\",\"20\",{\"property\":\"og:description\",\"content\":\"Servidor MU Online Season 6 gratis de la comunidad Smashdota: 60 FPS reales, PvP balanceado, Castle Siege, eventos automaticos, rankings y comunidad activa.\"}],[\"$\",\"meta\",\"21\",{\"property\":\"og:url\",\"content\":\"https://www.smashmu.com/es\"}],[\"$\",\"meta\",\"22\",{\"property\":\"og:site_name\",\"content\":\"SMASH MU\"}],[\"$\",\"meta\",\"23\",{\"property\":\"og:locale\",\"content\":\"es_ES\"}],[\"$\",\"meta\",\"24\",{\"property\":\"og:image\",\"content\":\"https://www.smashmu.com/og-image.png\"}],[\"$\",\"meta\",\"25\",{\"property\":\"og:image:width\",\"content\":\"1200\"}],[\"$\",\"meta\",\"26\",{\"property\":\"og:image:height\",\"content\":\"630\"}],[\"$\",\"meta\",\"27\",{\"property\":\"og:image:type\",\"content\":\"image/png\"}],[\"$\",\"meta\",\"28\",{\"property\":\"og:image:alt\",\"content\":\"MU Online Season 6 | SMASH MU 60 FPS\"}],[\"$\",\"meta\",\"29\",{\"property\":\"og:type\",\"content\":\"website\"}],[\"$\",\"meta\",\"30\",{\"name\":\"twitter:card\",\"content\":\"summary_large_image\"}],[\"$\",\"meta\",\"31\",{\"name\":\"twitter:title\",\"content\":\"MU Online Season 6 | SMASH MU 60 FPS\"}],[\"$\",\"meta\",\"32\",{\"name\":\"twitter:description\",\"content\":\"Servidor MU Online Season 6 gratis de la comunidad Smashdota: 60 FPS reales, PvP balanceado, Castle Siege, eventos automaticos, rankings y comunidad activa.\"}],[\"$\",\"meta\",\"33\",{\"name\":\"twitter:image\",\"content\":\"https://www.smashmu.com/og-image.png\"}],[\"$\",\"link\",\"34\",{\"rel\":\"icon\",\"href\":\"/favicon.ico\",\"sizes\":\"any\"}],[\"$\",\"link\",\"35\",{\"rel\":\"icon\",\"href\":\"/favicon-16x16.png\",\"sizes\":\"16x16\",\"type\":\"image/png\"}],\"$L25\",\"$L26\",\"$L27\"],\"error\":null,\"digest\":\"$undefined\"}\n"])
+        </script>
+        <script>
+            self.__next_f.push([1, "25:[\"$\",\"link\",\"36\",{\"rel\":\"icon\",\"href\":\"/favicon-32x32.png\",\"sizes\":\"32x32\",\"type\":\"image/png\"}]\n26:[\"$\",\"link\",\"37\",{\"rel\":\"apple-touch-icon\",\"href\":\"/apple-touch-icon.png\",\"type\":\"image/png\",\"sizes\":\"180x180\"}]\n27:[\"$\",\"$L28\",\"38\",{}]\n13:\"$e:metadata\"\n"])
+        </script>
+    </body>
+</html>

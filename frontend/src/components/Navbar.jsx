@@ -41,6 +41,7 @@ export default function Navbar() {
           </Link>
         )))}
         <Link to="/clanes" onClick={() => setOpen(false)}>Clanes</Link>
+        <Link to="/ligas" onClick={() => setOpen(false)}>Ligas</Link>
         {user ? (
           <NavLink to={user.role === 'miembro' ? '/invasiones' : '/admin'} className="btn btn--sm" onClick={() => setOpen(false)}>
             {user.role === 'miembro' ? 'Mi reporte' : 'Panel'}
